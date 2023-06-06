@@ -1,6 +1,9 @@
+import 'dart:ui';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:lucideye/config/navigations.dart';
+import 'package:lucideye/constants/colors.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -26,37 +29,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     double width = MediaQuery.of(context).size.width;
     final PageController controller = PageController();
     return Scaffold(
+        backgroundColor: mainColor,
         body: SafeArea(
           child: Column(
             children: [
               SizedBox(
                 height: height * 0.06,
               ),
-              Text.rich(
-                textAlign: TextAlign.center,
-                TextSpan(
-                  text: 'Lucid ',
-                  style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87),
-                  children: <TextSpan>[
-                    TextSpan(
-                      text: 'Eye',
-                      style: const TextStyle(
-                        fontSize: 21,
-                        color: Colors.blueGrey,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () {
-                          //link to T & C
-                        },
-                    ),
-                  ],
-                ),
-              ),
-              
               SizedBox(
                 width: width,
                 height: height * 0.65,
@@ -68,26 +47,29 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       },
                       children: <Widget>[
                         buildPage(
-                          pageWidth: width,
-                          pageHeight: height,
-                          color: Colors.white,
-                          urlImage: "assets/img2.png",
-                          title: "Help visiually impaired to navigate",
-                        ),
+                            pageWidth: width,
+                            pageHeight: height,
+                            color: Colors.white,
+                            urlImage: "assets/specs.png",
+                            title: "Mixed Reality",
+                            titleDecsription:
+                                "Gives high resultion for both VR and AR when navigating"),
                         buildPage(
-                          pageWidth: width,
-                          pageHeight: height,
-                          color: Colors.white,
-                          urlImage: "assets/img1.png",
-                          title: "No more walking cane or a personal navigator",
-                        ),
+                            pageWidth: width,
+                            pageHeight: height,
+                            color: Colors.white,
+                            urlImage: "assets/img1.png",
+                            title: "Blind Assistance",
+                            titleDecsription:
+                                "Helps visially impaired individuals to see the world around them through AI and AR"),
                         buildPage(
-                          pageWidth: width,
-                          pageHeight: height,
-                          color: Colors.white,
-                          urlImage: "assets/person.jpg",
-                          title: "Find nearest help on emergencies ",
-                        )
+                            pageWidth: width,
+                            pageHeight: height,
+                            color: Colors.white,
+                            urlImage: "assets/specsi.png",
+                            title: "Object Detection ",
+                            titleDecsription:
+                                "The software will allow users to take advantage of object detection AI and VOICE over")
                       ]),
                 ),
               ),
@@ -96,7 +78,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         ),
         bottomSheet: Container(
           width: width,
-          height: height * 0.25,
+          height: height * 0.2,
+          color: mainColor,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -108,8 +91,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       dotHeight: 10,
                       dotWidth: 10,
                       type: WormType.thin,
-                      dotColor: Colors.grey.withOpacity(0.5),
-                      activeDotColor: Colors.blueGrey
+                      dotColor: white.withOpacity(0.5),
+                      activeDotColor: white
                       // strokeWidth: 5,
                       ),
                   onDotClicked: (index) => controller.animateToPage(index,
@@ -122,46 +105,23 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   print("===================STARTED NAVIGATION=========");
 
                   Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => NavigationBarScreen()),
-            );
-            print("===================ENDED NAVIGATION=========");
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => NavigationBarScreen()),
+                  );
+                  print("===================ENDED NAVIGATION=========");
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  shadowColor: Colors.red,
+                  backgroundColor: white,
+                  shadowColor: greyd,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(width * 0.8),
+                    borderRadius: BorderRadius.circular(15),
                   ),
-                  minimumSize: Size(width * 0.8, 40),
+                  minimumSize: Size(width * 0.8, 50),
                 ),
                 child: const Text(
                   'Let\'s Start',
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
-              ),
-              Text.rich(
-                textAlign: TextAlign.center,
-                TextSpan(
-                  text: 'Have an Account? ',
-                  style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87),
-                  children: <TextSpan>[
-                    TextSpan(
-                      text: 'Log in',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.blueGrey,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () {
-                          //link to T & C
-                        },
-                    ),
-                  ],
+                  style: TextStyle(fontSize: 16, color: mainColor),
                 ),
               ),
             ],
@@ -169,13 +129,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         ));
   }
 
-  Widget buildPage({
-    required double pageWidth,
-    required double pageHeight,
-    required Color color,
-    required String urlImage,
-    required String title,
-  }) =>
+  Widget buildPage(
+          {required double pageWidth,
+          required double pageHeight,
+          required Color color,
+          required String urlImage,
+          required String title,
+          required String titleDecsription}) =>
       Container(
         width: pageWidth,
         child: Center(
@@ -185,28 +145,78 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 width: pageWidth * 0.9,
                 height: pageHeight * 0.65,
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Center(
                       child: Center(
-                        child: SizedBox(
-                          height: pageHeight * 0.65 * 0.7,
-                          child: Image.asset(urlImage),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: white,
+                                  width: 1.0,
+                                ),
+                                color: white.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(15)),
+                            padding: EdgeInsets.all(10),
+                            child: Stack(
+                              children: [
+                                BackdropFilter(
+                                  filter:
+                                      ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: white,
+                                          width: 1.0,
+                                        ),
+                                        color: white.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(15),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.grey.withOpacity(0.5),
+                                            spreadRadius: 10,
+                                            blurRadius: 10,
+                                            offset: Offset(0, 3),
+                                          ),
+                                        ]),
+                                    padding: EdgeInsets.all(10),
+                                    height: pageHeight * 0.65 * 0.6,
+                                    width: pageHeight * 0.65 * 0.6,
+                                    child: Image.asset(urlImage),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                     ),
                     Container(
                       width: pageWidth * 0.7,
-                      padding: const EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(10),
                       child: Text(
                         title,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
-                            fontSize: 16,
+                            fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black),
+                            color: white),
                       ),
                     ),
+                    Container(
+                      width: pageWidth * 0.7,
+                      padding: const EdgeInsets.all(5),
+                      child: Text(
+                        titleDecsription,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: white.withOpacity(0.6)),
+                      ),
+                    )
                   ],
                 ),
               )

@@ -4,6 +4,8 @@ import 'package:lucideye/constants/colors.dart';
 // ignore: depend_on_referenced_packages
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:lucideye/shared_components/placesinputdialog.dart';
+import 'package:lucideye/shared_components/searchbar.dart';
 import 'package:open_route_service/open_route_service.dart';
 import 'package:location/location.dart';
 import 'package:flutter_map/plugin_api.dart';
@@ -29,7 +31,8 @@ class _MapScreenState extends State<MapScreen> {
   String? _serviceError = '';
   int interActiveFlags = InteractiveFlag.all;
   double zoomLevel = 15;
-  final FitBoundsOptions options =const FitBoundsOptions(padding: EdgeInsets.all(0));
+  final FitBoundsOptions options =
+      const FitBoundsOptions(padding: EdgeInsets.all(0));
 
   void initLocationService() async {
     await _locationService.changeSettings(
@@ -39,7 +42,6 @@ class _MapScreenState extends State<MapScreen> {
     LocationData? location;
     bool serviceEnabled;
     bool serviceRequestResult;
-    
 
     try {
       //
@@ -74,7 +76,7 @@ class _MapScreenState extends State<MapScreen> {
           return;
         }
       }
-      
+
       print("=======================================LOCATION DONE");
       print(_currentLocation);
     } on PlatformException catch (e) {
@@ -91,34 +93,33 @@ class _MapScreenState extends State<MapScreen> {
 
   Future<void> _getRoutePoints() async {
     final OpenRouteService client = OpenRouteService(apiKey: apiKey);
-    try{
+    try {
       final List<ORSCoordinate> routeCoordinates =
-        await client.directionsRouteCoordsGet(
-      startCoordinate: ORSCoordinate(
-          latitude: currentLatLng.latitude.toDouble(),
-          longitude: currentLatLng.longitude.toDouble()),
-      endCoordinate: ORSCoordinate(
-          latitude: endPoint.latitude.toDouble(),
-          longitude: endPoint.longitude.toDouble()),
-    );
-    routeCoordinates.forEach(print);
-    routePoints = routeCoordinates
-        .map((coordinate) => LatLng(coordinate.latitude, coordinate.longitude))
-        .toList();
-    print("=======================================ROUTE POINTS DONE");
-    }catch (e){
+          await client.directionsRouteCoordsGet(
+        startCoordinate: ORSCoordinate(
+            latitude: currentLatLng.latitude.toDouble(),
+            longitude: currentLatLng.longitude.toDouble()),
+        endCoordinate: ORSCoordinate(
+            latitude: endPoint.latitude.toDouble(),
+            longitude: endPoint.longitude.toDouble()),
+      );
+      routeCoordinates.forEach(print);
+      routePoints = routeCoordinates
+          .map(
+              (coordinate) => LatLng(coordinate.latitude, coordinate.longitude))
+          .toList();
+      print("=======================================ROUTE POINTS DONE");
+    } catch (e) {
       print("=======================================ROUTE POINTS FAILED");
     }
-        
   }
 
   @override
   void initState() {
-    
     _mapController = MapController();
     initLocationService();
     _getRoutePoints();
-    
+
     super.initState();
   }
 
@@ -126,7 +127,7 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     double displayWidth = MediaQuery.of(context).size.width;
     double displayHeight = MediaQuery.of(context).size.height;
-    
+
     if (_currentLocation != null) {
       currentLatLng =
           LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!);
@@ -135,35 +136,6 @@ class _MapScreenState extends State<MapScreen> {
       // currentLatLng = LatLng(0, 0);
     }
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: greyd,
-        leading: IconButton(
-          onPressed: () {},
-          icon: const Icon(
-            Icons.menu,
-            size: 20,
-            color: white,
-          ),
-        ),
-        title: const Center(
-          child: Text(
-            'My Street Navigation',
-            style: TextStyle(
-                fontSize: 15, color: white, fontWeight: FontWeight.w300),
-          ),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(
-              Icons.info_outline,
-              size: 20,
-              color: white,
-            ),
-          )
-        ],
-      ),
       body: RefreshIndicator(
         onRefresh: () async {
           await _getRoutePoints();
@@ -181,304 +153,217 @@ class _MapScreenState extends State<MapScreen> {
                     child: Column(
                       children: [
                         Flexible(
-                          child:_currentLocation != null? FlutterMap(
-                            options: MapOptions(
-                              center: currentLatLng,
-                              zoom: zoomLevel,
-                              onTap: (tapPosition, point) {
-                                setState(() {
-                                  debugPrint('onTap');
-                                  _getRoutePoints();
-                                });
-                              },
-                            ),
-                            children: [
-                              TileLayer(
-                                urlTemplate:
-                                    'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                                userAgentPackageName:
-                                    'dev.fleaflet.flutter_map.example',
-                              ),
-                              PolylineLayer(
-                                polylines: [
-                                  Polyline(
-                                      points: routePoints,
-                                      strokeWidth: 5,
-                                      color: Colors.blue),
-                                ],
-                              ),
-                              MarkerLayer(
-                                markers: [
-                                  Marker(
-                                    width: displayHeight * 0.05,
-                                    height: displayHeight * 0.05,
-                                    point: currentLatLng,
-                                    builder: (ctx) => Container(
-                                      width: displayHeight * 0.05,
-                                      height: displayHeight * 0.05,
-                                      decoration: BoxDecoration(
-                                          color: Colors.green,
-                                          borderRadius: BorderRadius.circular(
-                                              displayHeight * 0.05),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: greyd.withOpacity(0.5),
-                                              spreadRadius: 2,
-                                              blurRadius: 4,
-                                              offset: const Offset(0, 3),
-                                            ),
-                                          ],
-                                          border: Border.all(
-                                            color: Colors.white,
-                                            width: 1,
-                                          )),
-                                      
-                                    ),
+                          child: _currentLocation != null
+                              ? FlutterMap(
+                                  options: MapOptions(
+                                    center: currentLatLng,
+                                    zoom: zoomLevel,
+                                    onTap: (tapPosition, point) {
+                                      setState(() {
+                                        debugPrint('onTap');
+                                        _getRoutePoints();
+                                      });
+                                    },
                                   ),
-                                  Marker(
-                                    width:displayHeight * 0.05,
-                                    height: displayHeight * 0.05,
-                                    point: endPoint,
-                                    builder: (ctx) => Container(
-                                      width: displayHeight * 0.05,
-                                      height: displayHeight * 0.05,
-                                      decoration: BoxDecoration(
-                                          color: Colors.red,
-                                          borderRadius: BorderRadius.circular(
-                                              displayHeight * 0.05),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: greyd.withOpacity(0.5),
-                                              spreadRadius: 2,
-                                              blurRadius: 4,
-                                              offset: const Offset(0, 3),
-                                            ),
-                                          ],
-                                          border: Border.all(
-                                            color: Colors.white,
-                                            width: 1,
-                                          )),
-                                      
+                                  children: [
+                                    TileLayer(
+                                      urlTemplate:
+                                          'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                      userAgentPackageName:
+                                          'dev.fleaflet.flutter_map.example',
                                     ),
-                                  ),
-                                ],
-                              )
-                            ],
-                          ):Center(
-                        child: Container(
-                          width: 50,
-                          height: 50,
-                          child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(greyd)
-                          )),
-                      ),
+                                    PolylineLayer(
+                                      polylines: [
+                                        Polyline(
+                                            points: routePoints,
+                                            strokeWidth: 5,
+                                            color: Colors.blue),
+                                      ],
+                                    ),
+                                    MarkerLayer(
+                                      markers: [
+                                        Marker(
+                                          width: displayHeight * 0.12,
+                                          height: displayHeight * 0.12,
+                                          point: currentLatLng,
+                                          builder: (ctx) => Container(
+                                            width: displayHeight * 0.12,
+                                            height: displayHeight * 0.12,
+                                            decoration: BoxDecoration(
+                                              color:
+                                                  Colors.green.withOpacity(0.5),
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      displayHeight * 0.1),
+                                            ),
+                                            child: Center(
+                                              child: Stack(
+                                                children: [
+                                                  Container(
+                                                    width:
+                                                        displayHeight * 0.025,
+                                                    height:
+                                                        displayHeight * 0.025,
+                                                    decoration: BoxDecoration(
+                                                        color: Colors.green,
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                                displayHeight *
+                                                                    0.05),
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                            color: greyd
+                                                                .withOpacity(
+                                                                    0.5),
+                                                            spreadRadius: 2,
+                                                            blurRadius: 4,
+                                                            offset:
+                                                                const Offset(
+                                                                    0, 3),
+                                                          ),
+                                                        ],
+                                                        border: Border.all(
+                                                          color: Colors.white,
+                                                          width: 1,
+                                                        )),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Marker(
+                                          width: displayHeight * 0.12,
+                                          height: displayHeight * 0.12,
+                                          point: endPoint,
+                                          builder: (ctx) => locationPoint(
+                                              displayHeight: displayHeight),
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                )
+                              : Center(
+                                  child: Container(
+                                      width: 50,
+                                      height: 50,
+                                      child: const CircularProgressIndicator(
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  greyd))),
+                                ),
                         ),
                       ],
                     ),
                   ),
                   //==============BUTTONS, SEARCH BAR, MAP DETAILS AND ALL STAFF
                   Positioned(
-                    child: Container(
-                      width: displayWidth,
-                      height: displayHeight * 0.7,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          //Container to mute and add sound
-                          SizedBox(
-                            width: displayWidth,
-                            height: displayHeight * 0.1,
-                            child: Stack(
-                              children: [
-                                Container(
-                                  width: displayWidth,
-                                  height: displayHeight * 0.05,
-                                  padding: const EdgeInsets.only(left: 20),
-                                  color: greyd,
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        width: 8,
-                                        height: 8,
-                                        decoration: BoxDecoration(
-                                          color:_currentLocation != null?Colors.green: Colors.red,
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        width: 10,
-                                      ),
-                                      Text(
-                                        _currentLocation != null?'Active':'Not Active',
-                                        style: TextStyle(
-                                            fontSize: 10,
-                                            color: white,
-                                            fontWeight: FontWeight.bold),
-                                      )
-                                    ],
+                    child: SafeArea(
+                      child: Container(
+                        width: displayWidth,
+                        height: displayHeight,
+                        child: Column(
+                          children: [
+                            Container(
+                              width: displayWidth,
+                              padding:
+                                  const EdgeInsets.only(left: 20, right: 20),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  IconButton(
+                                    onPressed: () {},
+                                    icon: const Icon(
+                                      Icons.menu,
+                                      size: 30,
+                                    ),
                                   ),
-                                ),
-                                Positioned(
-                                  child: Container(
-                                    padding: const EdgeInsets.only(right: 15),
-                                    width: displayWidth,
-                                    height: displayHeight * 0.1,
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        Container(
-                                          width: displayHeight * 0.05,
-                                          height: displayHeight * 0.05,
-                                          decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                      displayHeight * 0.05),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black
-                                                      .withOpacity(0.5),
-                                                  spreadRadius: 2,
-                                                  blurRadius: 4,
-                                                  offset: const Offset(0, 3),
-                                                ),
-                                              ]),
-                                          child: IconButton(
-                                            onPressed: () {},
-                                            icon: Icon(Icons.volume_up,
-                                                size: displayHeight * 0.025,
-                                                color: greyd),
+                                  Container(
+                                    width: 35,
+                                    height: 35,
+                                    decoration: BoxDecoration(
+                                        color: white,
+                                        borderRadius: BorderRadius.circular(10),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.grey.withOpacity(0.5),
+                                            spreadRadius: 2,
+                                            blurRadius: 5,
+                                            offset: const Offset(0, 3),
                                           ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
+                                        ]),
+                                    child: IconButton(
+                                        onPressed: () {},
+                                        icon: const Icon(
+                                          Icons.navigation,
+                                          size: 15,
+                                          color: mainColor,
+                                        )),
+                                  )
+                                ],
+                              ),
                             ),
-                          ),
-
-                          //Container to show possible places and auto complete
-                          Container(
-                            width: displayWidth,
-                            padding: const EdgeInsets.all(15),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Container(
-                                      width: displayHeight * 0.05,
-                                      height: displayHeight * 0.05,
-                                      decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.circular(
-                                              displayHeight * 0.05),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color:
-                                                  Colors.black.withOpacity(0.5),
-                                              spreadRadius: 2,
-                                              blurRadius: 4,
-                                              offset: const Offset(0, 3),
-                                            ),
-                                          ]),
-                                      child: IconButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            zoomLevel++;
-                                          });
-                                          print(zoomLevel);
-                                        },
-                                        icon: Icon(
-                                          Icons.zoom_in,
-                                          size: displayHeight * 0.025,
-                                          color: greyd,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    Container(
-                                      width: displayHeight * 0.05,
-                                      height: displayHeight * 0.05,
-                                      decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.circular(
-                                              displayHeight * 0.05),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color:
-                                                  Colors.black.withOpacity(0.5),
-                                              spreadRadius: 2,
-                                              blurRadius: 4,
-                                              offset: const Offset(0, 3),
-                                            ),
-                                          ]),
-                                      child: IconButton(
-                                        onPressed: () {
-                                          
-                                          setState(() {
-                                            zoomLevel--;
-                                          });
-                                          
-                                          print(zoomLevel);
-                                        },
-                                        icon: Icon(
-                                          Icons.zoom_out,
-                                          size: displayHeight * 0.025,
-                                          color: greyd,
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                Container(
-                                  width: displayHeight * 0.08,
-                                  height: displayHeight * 0.08,
-                                  decoration: BoxDecoration(
-                                      color: greyd,
-                                      borderRadius: BorderRadius.circular(
-                                          displayHeight * 0.05),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: greyd.withOpacity(0.5),
-                                          spreadRadius: 2,
-                                          blurRadius: 4,
-                                          offset: const Offset(0, 3),
-                                        ),
-                                      ]),
-                                  child: IconButton(
-                                    onPressed: () {
-                                      initLocationService();
-                                      _getRoutePoints();
-                                      
-                                    },
-                                    icon: Icon(
-                                      Icons.navigation,
-                                      size: displayHeight * 0.035,
-                                      color: Colors.white,
-                                    ),
+                            //SEARCH BAR
+                            Container(
+                              width: displayWidth,
+                              height: displayHeight * 0.3,
+                              padding: EdgeInsets.all(20),
+                              color: Colors.red,
+                              child: Column(
+                                children: [
+                                  CustomTextInput(
+                                    startIcon: Icons.email,
+                                    endIcon: Icons.visibility_off,
                                   ),
-                                ),
-                              ],
-                            ),
-                          )
-
-                          //Container for zoom buttons and change place
-                        ],
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
                       ),
                     ),
                   )
                   //==============BUTTONS, SEARCH BAR, MAP DETAILS AND ALL STAFF
                 ],
               )),
+        ),
+      ),
+    );
+  }
+
+  Widget locationPoint({required double displayHeight}) {
+    return Container(
+      width: displayHeight * 0.12,
+      height: displayHeight * 0.12,
+      decoration: BoxDecoration(
+        color: Colors.red.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(displayHeight * 0.1),
+      ),
+      child: Center(
+        child: Stack(
+          children: [
+            Container(
+              width: displayHeight * 0.025,
+              height: displayHeight * 0.025,
+              decoration: BoxDecoration(
+                color: Colors.red,
+                borderRadius: BorderRadius.circular(displayHeight * 0.05),
+                boxShadow: [
+                  BoxShadow(
+                    color: greyd.withOpacity(0.5),
+                    spreadRadius: 2,
+                    blurRadius: 4,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+                border: Border.all(
+                  color: Colors.white,
+                  width: 1,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
