@@ -9,6 +9,7 @@ import 'package:lucideye/shared_components/searchbar.dart';
 import 'package:open_route_service/open_route_service.dart';
 import 'package:location/location.dart';
 import 'package:flutter_map/plugin_api.dart';
+import 'package:geocoder/geocoder.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -20,17 +21,21 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   final apiKey = "5b3ce3597851110001cf62482ba1a7913a98486e919d38677db5c78f";
   late LatLng startPoint = LatLng(-17.8250, 31.0488);
-  final LatLng endPoint = LatLng(-17.3594, 30.1815);
+  late LatLng endPoint = LatLng(-17.3594, 30.1815);
+  late LatLng centerLatLng;
   final Location _locationService = Location();
   late final MapController _mapController;
+  TextEditingController _searchcontroller = TextEditingController();
   LocationData? _currentLocation;
   late LatLng currentLatLng;
   List<LatLng> routePoints = [];
+  List<Address> _addresses = [];
   bool _liveUpdate = false;
   bool _permission = false;
   String? _serviceError = '';
+  bool mapLoading =false;
   int interActiveFlags = InteractiveFlag.all;
-  double zoomLevel = 15;
+  double zoomLevel = 17;
   final FitBoundsOptions options =
       const FitBoundsOptions(padding: EdgeInsets.all(0));
 
@@ -91,6 +96,12 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
 
+  void _refreshMap() {
+    initLocationService();
+    _getRoutePoints();
+    
+  }
+
   Future<void> _getRoutePoints() async {
     final OpenRouteService client = OpenRouteService(apiKey: apiKey);
     try {
@@ -114,12 +125,12 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
 
+
+
   @override
   void initState() {
     _mapController = MapController();
     initLocationService();
-    _getRoutePoints();
-
     super.initState();
   }
 
@@ -131,6 +142,9 @@ class _MapScreenState extends State<MapScreen> {
     if (_currentLocation != null) {
       currentLatLng =
           LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!);
+      setState(() {
+        centerLatLng = currentLatLng;
+      });
     } else {
       initLocationService();
       // currentLatLng = LatLng(0, 0);
@@ -153,7 +167,7 @@ class _MapScreenState extends State<MapScreen> {
                     child: Column(
                       children: [
                         Flexible(
-                          child: _currentLocation != null
+                          child: _currentLocation != null && !mapLoading 
                               ? FlutterMap(
                                   options: MapOptions(
                                     center: currentLatLng,
@@ -171,6 +185,7 @@ class _MapScreenState extends State<MapScreen> {
                                           'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                                       userAgentPackageName:
                                           'dev.fleaflet.flutter_map.example',
+                                          subdomains: ['a', 'b', 'c'],
                                     ),
                                     PolylineLayer(
                                       polylines: [
@@ -185,7 +200,7 @@ class _MapScreenState extends State<MapScreen> {
                                         Marker(
                                           width: displayHeight * 0.12,
                                           height: displayHeight * 0.12,
-                                          point: currentLatLng,
+                                          point: centerLatLng,
                                           builder: (ctx) => Container(
                                             width: displayHeight * 0.12,
                                             height: displayHeight * 0.12,
@@ -294,9 +309,11 @@ class _MapScreenState extends State<MapScreen> {
                                           ),
                                         ]),
                                     child: IconButton(
-                                        onPressed: () {},
+                                        onPressed: () {
+                                         _refreshMap();
+                                        },
                                         icon: const Icon(
-                                          Icons.navigation,
+                                          Icons.refresh,
                                           size: 15,
                                           color: mainColor,
                                         )),
@@ -307,18 +324,58 @@ class _MapScreenState extends State<MapScreen> {
                             //SEARCH BAR
                             Container(
                               width: displayWidth,
-                              height: displayHeight * 0.3,
+                              height: displayHeight * 0.4,
                               padding: EdgeInsets.all(20),
-                              color: Colors.red,
                               child: Column(
                                 children: [
                                   CustomTextInput(
-                                    startIcon: Icons.email,
-                                    endIcon: Icons.visibility_off,
-                                  ),
+                                      startIcon: Icons.location_on,
+                                      endIcon: Icons.mic,
+                                      controller: _searchcontroller,
+                                      onChanged: (value) async {
+                                        if (value.isNotEmpty) {
+                                          print('Searching for: $value');
+                                          String query = _searchcontroller.text;
+                                          List<Address> addresses =
+                                              await Geocoder.local
+                                                  .findAddressesFromQuery(
+                                                      query);
+                                          setState(() {
+                                            _addresses = addresses;
+                                          });
+                                          print(_addresses);
+                                        }
+                                      }),
+                                  _searchcontroller.text.isNotEmpty
+                                      ? Container(
+                                          margin: EdgeInsets.only(top: 1),
+                                          width: displayWidth * 0.75,
+                                          height: displayHeight * 0.2,
+                                          decoration: BoxDecoration(
+                                              color: white.withOpacity(0.75),
+                                              borderRadius: const BorderRadius.only(
+                                                  bottomLeft:
+                                                      Radius.circular(5),
+                                                  bottomRight:
+                                                      Radius.circular(5)),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.grey
+                                                      .withOpacity(0.5),
+                                                  spreadRadius: 2,
+                                                  blurRadius: 5,
+                                                  offset: const Offset(0, 3),
+                                                ),
+                                              ]),
+                                          child:
+                                              _searchcontroller.text.isNotEmpty
+                                                  ? _buildResults()
+                                                  : Container(),
+                                        )
+                                      : Container(),
                                 ],
                               ),
-                            )
+                            ),
                           ],
                         ),
                       ),
@@ -330,6 +387,40 @@ class _MapScreenState extends State<MapScreen> {
         ),
       ),
     );
+  }
+
+  Widget _buildResults() {
+    if (_addresses.isEmpty) {
+      return const Center(
+        child: Text(
+          'searching',
+          style: TextStyle(
+              fontSize: 10, color: greyc, fontWeight: FontWeight.bold),
+        ),
+      );
+    } else {
+      return ListView.builder(
+        itemCount: 1,
+        itemBuilder: (BuildContext context, int index) {
+          final address = _addresses[index];
+          return ListTile(
+            title: Text(address.addressLine),
+            subtitle: Text(
+                '${address.locality}, ${address.adminArea} ${address.postalCode}, ${address.countryName}'),
+            onTap: () {
+              setState(() {
+                endPoint = LatLng(address.coordinates.latitude,
+                    address.coordinates.longitude);
+              });
+              if (_currentLocation != null) {
+                _getRoutePoints();
+                
+              }
+            },
+          );
+        },
+      );
+    }
   }
 
   Widget locationPoint({required double displayHeight}) {

@@ -1,16 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:lucideye/constants/colors.dart';
 
-class CustomTextInput extends StatelessWidget {
+class CustomTextInput extends StatefulWidget {
   final IconData startIcon;
   final IconData endIcon;
+  final TextEditingController controller;
+  final ValueChanged<String> onChanged;
 
   const CustomTextInput({
     Key? key,
     this.startIcon = Icons.person,
     this.endIcon = Icons.lock,
+    required this.controller,
+    required this.onChanged,
   }) : super(key: key);
 
+  @override
+  State<CustomTextInput> createState() => _CustomTextInputState();
+}
+
+class _CustomTextInputState extends State<CustomTextInput> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -29,13 +38,16 @@ class CustomTextInput extends StatelessWidget {
         ],
       ),
       child: TextField(
+
+        controller: widget.controller,
+        onChanged: widget.onChanged,
         textAlignVertical: TextAlignVertical.center,
         style: TextStyle(fontSize: 13,decoration: TextDecoration.none),
         decoration: InputDecoration(
           border: InputBorder.none,
-          prefixIcon: Icon(startIcon,size: 15,),
-          suffixIcon: Icon(endIcon,size: 15,),
-          hintText: 'Enter text...',
+          prefixIcon: Icon(widget.startIcon,size: 18,color: greyb,),
+          suffixIcon: Icon(widget.endIcon,size: 25,),
+          hintText: 'Search location...',
           filled: true,
           fillColor: white,
           contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 12),

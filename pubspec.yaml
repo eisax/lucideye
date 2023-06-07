@@ -45,6 +45,8 @@ dependencies:
   location: ^4.4.0
   smooth_page_indicator: ^1.1.0
   animated_text_kit: ^4.2.2
+  permission_handler: ^10.2.0
+  geocoder: ^0.2.1
 
 dev_dependencies:
   flutter_test:
