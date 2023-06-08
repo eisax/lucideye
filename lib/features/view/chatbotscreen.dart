@@ -5,6 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:lucideye/config/navigations.dart';
 import 'package:lucideye/constants/colors.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'dart:convert';
+import 'dart:core';
+import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
+import 'package:lucideye/shared_components/custommessagebox.dart';
+import 'package:lucideye/shared_components/searchbar.dart';
 
 class ChatbotScreen extends StatefulWidget {
   const ChatbotScreen({super.key});
@@ -15,54 +21,78 @@ class ChatbotScreen extends StatefulWidget {
 
 class _ChatbotScreenState extends State<ChatbotScreen> {
   final ScrollController _scrollController = ScrollController();
+  TextEditingController _chatbotcontroller = TextEditingController();
   NavigationBarScreen n = const NavigationBarScreen();
+  late String query = "";
+
   final List<Map<String, dynamic>> messages = [
     {
       "message": "Hi",
       "time": "12:53",
-      "type": "user",
-    },
-    {
-      "message": "Hi, How are you doing",
-      "time": "12:54",
-      "type": "bot",
-    },
-    {
-      "message": "I'm okay",
-      "time": "12:55",
-      "type": "user",
-    },
-    {
-      "message": "good, how can I help you",
-      "time": "12:55",
-      "type": "bot",
-    },
-    {
-      "message": "I need to know what time it is?",
-      "time": "12:55",
-      "type": "user",
-    },
-    {
-      "message": "Oh great, the time is 15:17",
-      "time": "12:57",
-      "type": "bot",
-    },
-    {
-      "message": "How else can you help",
-      "time": "12:57",
-      "type": "user",
-    },
-    {
-      "message":
-          "I am a Lucid your bot and I can help through giving you the info that you want, I can also help you know thngs and discuss",
-      "time": "12:57",
       "type": "bot",
     }
   ];
+  //sending message fn api
+  void sendMessage(String message) async {
+    DateTime now = DateTime.now();
+    String formattedTime = DateFormat('HH:mm:ss').format(now);
+    //typed message
+    Map<String, dynamic> newMessage = {
+      "message": message,
+      "time": formattedTime,
+      "type": "user",
+    };
+    //add typed message to list
+    setState(() {
+      messages.add(newMessage);
+      _chatbotcontroller.clear();
+      query;
+    });
+    onScrollChatToEnd();
+    //prepare to send message to backend
+    final requestData = {"message": message};
+
+    //send message to backend
+    final response = await http.post(
+      Uri.parse('http://192.168.100.21:5000/talktome'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(requestData),
+    );
+    //check if there is no error
+    if (response.statusCode == 200) {
+      //get response body
+      final jsonResponse = jsonDecode(response.body);
+      final messageResponse = jsonResponse['message'];
+      //get response message and add it to list
+      setState(() {
+        messages.add(jsonResponse);
+        _chatbotcontroller.clear();
+        query;
+      });
+      onScrollChatToEnd();
+
+      print(messages);
+    } else {
+      setState(() {
+        messages.removeLast();
+        _chatbotcontroller.text = message;
+      });
+      onScrollChatToEnd();
+      // handle error if it is there
+      print("Failed to send message. Error code: ${response.statusCode}");
+    }
+  }
+
   @override
   void initState() {
     super.initState();
 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    });
+  }
+
+  void onScrollChatToEnd() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
     });
@@ -106,6 +136,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                       icon: Icon(
                         Icons.arrow_back_ios,
                         size: displayWidth * 0.05,
+                        color: greyc,
                       ),
                     ),
                   ),
@@ -115,7 +146,9 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                     child: Row(
                       children: [
                         const CircleAvatar(
-                          child: Text('L'), // Use sender initials as avatar
+                          backgroundColor: greyc,
+                          foregroundColor: white,
+                          child: Text('M'), // Use sender initials as avatar
                         ),
                         Container(
                           height: displayWidth * 0.1,
@@ -128,14 +161,14 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                                 'Lucid Chatbot',
                                 style: TextStyle(
                                     fontSize: 10,
-                                    color: greyd,
+                                    color: greyc,
                                     fontWeight: FontWeight.bold),
                               ),
                               Text(
                                 'Active Now',
                                 style: TextStyle(
                                     fontSize: 8,
-                                    color: greyc,
+                                    color: greyd,
                                     fontWeight: FontWeight.w400),
                               )
                             ],
@@ -150,8 +183,9 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                     child: IconButton(
                       onPressed: () {},
                       icon: Icon(
-                        Icons.info_outline,
+                        Icons.notifications,
                         size: displayWidth * 0.05,
+                        color: greyc,
                       ),
                     ),
                   )
@@ -170,7 +204,8 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                     Expanded(
                       child: Container(
                         width: displayWidth,
-                        padding: const EdgeInsets.only(left:20,right:20,bottom: 5),
+                        padding: const EdgeInsets.only(
+                            left: 20, right: 20, bottom: 5),
                         child: ListView.builder(
                           controller: _scrollController,
                           itemCount: messages.length,
@@ -199,15 +234,14 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                     ),
                     Container(
                       width: displayWidth,
-                      padding: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(5),
                       child: Stack(
                         children: [
                           Center(
                             child: Container(
                               padding: const EdgeInsets.all(5),
-                              width: displayWidth * 0.9,
+                              width: displayWidth,
                               decoration: BoxDecoration(
-                                  color: Colors.white,
                                   borderRadius: BorderRadius.circular(10),
                                   boxShadow: [
                                     BoxShadow(
@@ -218,18 +252,23 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                                     ),
                                   ]),
                               child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  Expanded(
-                                    child: Container(
-                                      padding: EdgeInsets.all(10),
-                                      child: Text(
-                                        'Record Something....',
-                                        style: TextStyle(
-                                            fontSize: 10,
-                                            color: greyc,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
+                                  Container(
+                                    width: displayWidth * 0.7,
+                                    child: CustomMessageInput(
+                                        controller: _chatbotcontroller,
+                                        onChanged: (value) async {
+                                          if (value.isNotEmpty) {
+                                            print('Searching for: $value');
+
+                                            setState(() {
+                                              query = _chatbotcontroller.text;
+                                              _chatbotcontroller;
+                                            });
+                                          }
+                                        }),
                                   ),
                                   Container(
                                     width: 40,
@@ -246,9 +285,15 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                                           ),
                                         ]),
                                     child: IconButton(
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          if (_chatbotcontroller.text.isNotEmpty) {
+                                            sendMessage(query);
+                                          }
+                                        },
                                         icon: Icon(
-                                          Icons.mic,
+                                          _chatbotcontroller.text.isNotEmpty
+                                              ? Icons.send
+                                              : Icons.mic,
                                           size: 20,
                                           color: Colors.white,
                                         )),
@@ -286,10 +331,10 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
             decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(10),
-                    bottomRight: Radius.circular(10),
-                    bottomLeft: Radius.circular(10),
-                  ),
+                  topRight: Radius.circular(10),
+                  bottomRight: Radius.circular(10),
+                  bottomLeft: Radius.circular(10),
+                ),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.grey.withOpacity(0.5),
@@ -299,9 +344,11 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                   ),
                 ]),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CircleAvatar(
-                  backgroundColor: Colors.blue,
+                  backgroundColor: greyc,
+                  foregroundColor: white,
                   radius: 15,
                   child: Text('L'),
                 ),
@@ -321,7 +368,9 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                             color: greyc,
                             fontWeight: FontWeight.bold),
                       ),
-                      const SizedBox(height: 5,),
+                      const SizedBox(
+                        height: 5,
+                      ),
                       Text(
                         time,
                         style: TextStyle(
@@ -389,7 +438,9 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        const  SizedBox(height: 5,),
+                        const SizedBox(
+                          height: 5,
+                        ),
                         Text(
                           time,
                           style: TextStyle(
