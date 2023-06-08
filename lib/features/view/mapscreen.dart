@@ -33,7 +33,7 @@ class _MapScreenState extends State<MapScreen> {
   bool _liveUpdate = false;
   bool _permission = false;
   String? _serviceError = '';
-  bool mapLoading =false;
+  bool mapLoading = false;
   int interActiveFlags = InteractiveFlag.all;
   double zoomLevel = 17;
   final FitBoundsOptions options =
@@ -99,7 +99,6 @@ class _MapScreenState extends State<MapScreen> {
   void _refreshMap() {
     initLocationService();
     _getRoutePoints();
-    
   }
 
   Future<void> _getRoutePoints() async {
@@ -124,8 +123,6 @@ class _MapScreenState extends State<MapScreen> {
       print("=======================================ROUTE POINTS FAILED");
     }
   }
-
-
 
   @override
   void initState() {
@@ -167,7 +164,7 @@ class _MapScreenState extends State<MapScreen> {
                     child: Column(
                       children: [
                         Flexible(
-                          child: _currentLocation != null && !mapLoading 
+                          child: _currentLocation != null && !mapLoading
                               ? FlutterMap(
                                   options: MapOptions(
                                     center: currentLatLng,
@@ -185,14 +182,14 @@ class _MapScreenState extends State<MapScreen> {
                                           'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                                       userAgentPackageName:
                                           'dev.fleaflet.flutter_map.example',
-                                          subdomains: ['a', 'b', 'c'],
+                                      subdomains: ['a', 'b', 'c'],
                                     ),
                                     PolylineLayer(
                                       polylines: [
                                         Polyline(
                                             points: routePoints,
                                             strokeWidth: 5,
-                                            color: Colors.blue),
+                                            color: mainColor),
                                       ],
                                     ),
                                     MarkerLayer(
@@ -298,7 +295,7 @@ class _MapScreenState extends State<MapScreen> {
                                     width: 35,
                                     height: 35,
                                     decoration: BoxDecoration(
-                                        color: white,
+                                        color: mainColor,
                                         borderRadius: BorderRadius.circular(10),
                                         boxShadow: [
                                           BoxShadow(
@@ -310,12 +307,12 @@ class _MapScreenState extends State<MapScreen> {
                                         ]),
                                     child: IconButton(
                                         onPressed: () {
-                                         _refreshMap();
+                                          _refreshMap();
                                         },
                                         icon: const Icon(
                                           Icons.refresh,
                                           size: 15,
-                                          color: mainColor,
+                                          color: primaryColor,
                                         )),
                                   )
                                 ],
@@ -353,11 +350,12 @@ class _MapScreenState extends State<MapScreen> {
                                           height: displayHeight * 0.2,
                                           decoration: BoxDecoration(
                                               color: white.withOpacity(0.75),
-                                              borderRadius: const BorderRadius.only(
-                                                  bottomLeft:
-                                                      Radius.circular(5),
-                                                  bottomRight:
-                                                      Radius.circular(5)),
+                                              borderRadius:
+                                                  const BorderRadius.only(
+                                                      bottomLeft:
+                                                          Radius.circular(5),
+                                                      bottomRight:
+                                                          Radius.circular(5)),
                                               boxShadow: [
                                                 BoxShadow(
                                                   color: Colors.grey
@@ -404,9 +402,13 @@ class _MapScreenState extends State<MapScreen> {
         itemBuilder: (BuildContext context, int index) {
           final address = _addresses[index];
           return ListTile(
-            title: Text(address.addressLine),
+            title: Text(
+              address.addressLine,
+              style: const TextStyle(color: mainColor, fontWeight: FontWeight.bold),
+            ),
             subtitle: Text(
-                '${address.locality}, ${address.adminArea} ${address.postalCode}, ${address.countryName}'),
+              '${address.locality}, ${address.adminArea} ${address.postalCode}, ${address.countryName}',
+            ),
             onTap: () {
               setState(() {
                 endPoint = LatLng(address.coordinates.latitude,
@@ -414,7 +416,6 @@ class _MapScreenState extends State<MapScreen> {
               });
               if (_currentLocation != null) {
                 _getRoutePoints();
-                
               }
             },
           );

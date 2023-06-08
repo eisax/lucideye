@@ -26,16 +26,16 @@ class _CustomMessageInputState extends State<CustomMessageInput> {
       
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(15),
         color: white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 2,
-            blurRadius: 7,
-            offset: Offset(0, 3),
-          ),
-        ],
+        // boxShadow: [
+        //   BoxShadow(
+        //     color: Colors.grey.withOpacity(0.5),
+        //     spreadRadius: 2,
+        //     blurRadius: 7,
+        //     offset: Offset(0, 3),
+        //   ),
+        // ],
       ),
       child: TextField(
        maxLines: null,

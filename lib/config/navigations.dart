@@ -52,7 +52,7 @@ class _NavigationBarScreenState extends State<NavigationBarScreen> {
                 borderRadius: BorderRadius.circular(displayWidth * 0.5),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
+                    color: mainColor.withOpacity(0.2),
                     spreadRadius: 1,
                     blurRadius: 3,
                     offset: Offset(0, 2),
@@ -87,7 +87,7 @@ class _NavigationBarScreenState extends State<NavigationBarScreen> {
           Icon(
             icon,
             size: displayWidth * .05,
-            color: _selectedIndex == index ? greyd : Colors.grey,
+            color: _selectedIndex == index ? mainColor : mainColor.withOpacity(0.5),
           ),
           SizedBox(height: displayWidth * .015),
         ],

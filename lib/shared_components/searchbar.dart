@@ -42,11 +42,11 @@ class _CustomTextInputState extends State<CustomTextInput> {
         controller: widget.controller,
         onChanged: widget.onChanged,
         textAlignVertical: TextAlignVertical.center,
-        style: TextStyle(fontSize: 13,decoration: TextDecoration.none),
+        style: const TextStyle(fontSize: 13,decoration: TextDecoration.none,color: mainColor,),
         decoration: InputDecoration(
           border: InputBorder.none,
           prefixIcon: Icon(widget.startIcon,size: 18,color: greyb,),
-          suffixIcon: Icon(widget.endIcon,size: 25,),
+          suffixIcon: Icon(widget.endIcon,size: 25,color: mainColor,),
           hintText: 'Search location...',
           filled: true,
           fillColor: white,

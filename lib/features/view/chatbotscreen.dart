@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:lucideye/shared_components/custommessagebox.dart';
 import 'package:lucideye/shared_components/searchbar.dart';
+import 'package:connectivity/connectivity.dart';
 
 class ChatbotScreen extends StatefulWidget {
   const ChatbotScreen({super.key});
@@ -53,33 +54,43 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
     final requestData = {"message": message};
 
     //send message to backend
-    final response = await http.post(
-      Uri.parse('http://192.168.100.21:5000/talktome'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(requestData),
-    );
-    //check if there is no error
-    if (response.statusCode == 200) {
-      //get response body
-      final jsonResponse = jsonDecode(response.body);
-      final messageResponse = jsonResponse['message'];
-      //get response message and add it to list
-      setState(() {
-        messages.add(jsonResponse);
-        _chatbotcontroller.clear();
-        query;
-      });
-      onScrollChatToEnd();
+    try {
+      final response = await http.post(
+        Uri.parse('http://192.168.100.21:5000/talktome'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(requestData),
+      );
 
-      print(messages);
-    } else {
+      //check if there is no error
+      if (response.statusCode == 200) {
+        //get response body
+        final jsonResponse = jsonDecode(response.body);
+        final messageResponse = jsonResponse['message'];
+        //get response message and add it to list
+        setState(() {
+          messages.add(jsonResponse);
+          _chatbotcontroller.clear();
+          query;
+        });
+        onScrollChatToEnd();
+
+        print(messages);
+      } else {
+        setState(() {
+          messages.removeLast();
+          _chatbotcontroller.text = message;
+        });
+        onScrollChatToEnd();
+        // handle error if it is there
+        print("Failed to send message. Error code: ${response.statusCode}");
+      }
+    } catch (e) {
       setState(() {
         messages.removeLast();
         _chatbotcontroller.text = message;
       });
       onScrollChatToEnd();
-      // handle error if it is there
-      print("Failed to send message. Error code: ${response.statusCode}");
+      print("Failed to Connect to the endpoint");
     }
   }
 
@@ -234,23 +245,31 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                     ),
                     Container(
                       width: displayWidth,
-                      padding: const EdgeInsets.all(5),
+                      // padding: const EdgeInsets.all(5),
                       child: Stack(
                         children: [
                           Center(
                             child: Container(
                               padding: const EdgeInsets.all(5),
                               width: displayWidth,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.5),
-                                      spreadRadius: 2,
-                                      blurRadius: 5,
-                                      offset: Offset(0, 3),
-                                    ),
-                                  ]),
+                              decoration: const BoxDecoration(
+                                border: Border(
+                                  top: BorderSide(
+                                    color: white,
+                                    width: 1.0,
+                                  ),
+                                ),
+                                color: mainColor,
+                                // borderRadius: BorderRadius.circular(10),
+                                // boxShadow: [
+                                //   BoxShadow(
+                                //     color: Colors.grey.withOpacity(0.5),
+                                //     spreadRadius: 2,
+                                //     blurRadius: 5,
+                                //     offset: Offset(0, 3),
+                                //   ),
+                                // ],
+                              ),
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceEvenly,
@@ -264,17 +283,19 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                                             print('Searching for: $value');
 
                                             setState(() {
+                                              _chatbotcontroller.text;
                                               query = _chatbotcontroller.text;
-                                              _chatbotcontroller;
+                                              
                                             });
                                           }
+                                          
                                         }),
                                   ),
                                   Container(
                                     width: 40,
                                     height: 40,
                                     decoration: BoxDecoration(
-                                        color: greyd,
+                                        color: white,
                                         borderRadius: BorderRadius.circular(10),
                                         boxShadow: [
                                           BoxShadow(
@@ -286,7 +307,8 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                                         ]),
                                     child: IconButton(
                                         onPressed: () {
-                                          if (_chatbotcontroller.text.isNotEmpty) {
+                                          if (_chatbotcontroller
+                                              .text.isNotEmpty) {
                                             sendMessage(query);
                                           }
                                         },
@@ -295,7 +317,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                                               ? Icons.send
                                               : Icons.mic,
                                           size: 20,
-                                          color: Colors.white,
+                                          color: mainColor,
                                         )),
                                   )
                                 ],
@@ -330,6 +352,10 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
                 color: Colors.white,
+                border: Border.all(
+                  color: mainColor,
+                  width: 1.0,
+                ),
                 borderRadius: BorderRadius.only(
                   topRight: Radius.circular(10),
                   bottomRight: Radius.circular(10),
@@ -404,7 +430,11 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                  color: greyd,
+                  border: Border.all(
+                    color: white,
+                    width: 1.0,
+                  ),
+                  color: mainColor,
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(10),
                     bottomRight: Radius.circular(10),

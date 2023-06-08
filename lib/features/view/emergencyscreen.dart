@@ -30,8 +30,6 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
   int interActiveFlags = InteractiveFlag.all;
   double zoomLevel = 15;
 
-  
-
   void initLocationService() async {
     await _locationService.changeSettings(
       accuracy: LocationAccuracy.high,
@@ -135,22 +133,32 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: greyd,
+        backgroundColor: mainColor,
         leading: IconButton(
           onPressed: () {},
           icon: const Icon(
             Icons.menu,
             size: 20,
-            color: white,
+            color: primaryColor,
+          ),
+        ),
+        title: Center(
+          child: Text(
+            'Emergency',
+            style: TextStyle(
+                fontSize: 10, color: primaryColor, fontWeight: FontWeight.bold),
           ),
         ),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              initLocationService();
+              _getRoutePoints();
+            },
             icon: const Icon(
-              Icons.notifications_outlined,
+              Icons.refresh,
               size: 20,
-              color: white,
+              color: primaryColor,
             ),
           )
         ],
@@ -307,7 +315,6 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                                                 initLocationService();
                                                 _getRoutePoints();
                                               },
-                                              
                                               icon: Icon(
                                                 Icons.sos_sharp,
                                                 size:
@@ -374,6 +381,4 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
       ),
     );
   }
-
-  
 }

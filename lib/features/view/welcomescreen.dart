@@ -31,49 +31,53 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     return Scaffold(
         backgroundColor: mainColor,
         body: SafeArea(
-          child: Column(
-            children: [
-              SizedBox(
-                height: height * 0.06,
-              ),
-              SizedBox(
-                width: width,
-                height: height * 0.65,
-                child: SizedBox(
-                  child: PageView(
-                      controller: controller,
-                      onPageChanged: (index) {
-                        setState(() => isLastPage = index == 2);
-                      },
-                      children: <Widget>[
-                        buildPage(
-                            pageWidth: width,
-                            pageHeight: height,
-                            color: Colors.white,
-                            urlImage: "assets/specs.png",
-                            title: "Mixed Reality",
-                            titleDecsription:
-                                "Gives high resultion for both VR and AR when navigating"),
-                        buildPage(
-                            pageWidth: width,
-                            pageHeight: height,
-                            color: Colors.white,
-                            urlImage: "assets/img1.png",
-                            title: "Blind Assistance",
-                            titleDecsription:
-                                "Helps visially impaired individuals to see the world around them through AI and AR"),
-                        buildPage(
-                            pageWidth: width,
-                            pageHeight: height,
-                            color: Colors.white,
-                            urlImage: "assets/specsi.png",
-                            title: "Object Detection ",
-                            titleDecsription:
-                                "The software will allow users to take advantage of object detection AI and VOICE over")
-                      ]),
+          child: Container(
+            width: width,
+            
+            child: Column(
+              children: [
+                SizedBox(
+                  height: height * 0.06,
                 ),
-              ),
-            ],
+                SizedBox(
+                  width: width,
+                  height: height * 0.65,
+                  child: SizedBox(
+                    child: PageView(
+                        controller: controller,
+                        onPageChanged: (index) {
+                          setState(() => isLastPage = index == 2);
+                        },
+                        children: <Widget>[
+                          buildPage(
+                              pageWidth: width,
+                              pageHeight: height,
+                              color: Colors.white,
+                              urlImage: "assets/specs.png",
+                              title: "Mixed Reality",
+                              titleDecsription:
+                                  "Gives high resultion for both VR and AR when navigating"),
+                          buildPage(
+                              pageWidth: width,
+                              pageHeight: height,
+                              color: Colors.white,
+                              urlImage: "assets/img1.png",
+                              title: "Blind Assistance",
+                              titleDecsription:
+                                  "Helps visially impaired individuals to see the world around them through AI and AR"),
+                          buildPage(
+                              pageWidth: width,
+                              pageHeight: height,
+                              color: Colors.white,
+                              urlImage: "assets/specsi.png",
+                              title: "Object Detection ",
+                              titleDecsription:
+                                  "The software will allow users to take advantage of object detection AI and VOICE over")
+                        ]),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
         bottomSheet: Container(
@@ -92,7 +96,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       dotWidth: 10,
                       type: WormType.thin,
                       dotColor: white.withOpacity(0.5),
-                      activeDotColor: white
+                      activeDotColor: primaryColor
                       // strokeWidth: 5,
                       ),
                   onDotClicked: (index) => controller.animateToPage(index,
@@ -112,7 +116,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   print("===================ENDED NAVIGATION=========");
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: white,
+                  backgroundColor:primaryColor,
                   shadowColor: greyd,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15),
@@ -121,7 +125,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 ),
                 child: const Text(
                   'Let\'s Start',
-                  style: TextStyle(fontSize: 16, color: mainColor),
+                  style: TextStyle(fontSize: 16, color: white),
                 ),
               ),
             ],
@@ -138,6 +142,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           required String titleDecsription}) =>
       Container(
         width: pageWidth,
+        
         child: Center(
           child: Stack(
             children: [
@@ -154,7 +159,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           child: Container(
                             decoration: BoxDecoration(
                                 border: Border.all(
-                                  color: white,
+                                  color: white.withOpacity(0.1),
                                   width: 1.0,
                                 ),
                                 color: white.withOpacity(0.1),
@@ -168,16 +173,16 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                   child: Container(
                                     decoration: BoxDecoration(
                                         border: Border.all(
-                                          color: white,
+                                          color: white.withOpacity(0.1),
                                           width: 1.0,
                                         ),
                                         color: white.withOpacity(0.1),
-                                        borderRadius: BorderRadius.circular(15),
+                                        borderRadius: BorderRadius.circular(200),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: Colors.grey.withOpacity(0.5),
-                                            spreadRadius: 10,
-                                            blurRadius: 10,
+                                            color: Colors.grey.withOpacity(0.1),
+                                            spreadRadius: 5,
+                                            blurRadius: 5,
                                             offset: Offset(0, 3),
                                           ),
                                         ]),
