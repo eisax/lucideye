@@ -31,6 +31,26 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
       "message": "Hi",
       "time": "12:53",
       "type": "bot",
+    },
+    {
+      "message": "Hey",
+      "time": "12:53",
+      "type": "user",
+    },
+    {
+      "message": "I'm okay, how are you doing and how can I help?",
+      "time": "12:53",
+      "type": "bot",
+    },
+    {
+      "message": "I need to know how to download",
+      "time": "12:53",
+      "type": "user",
+    },
+    {
+      "message": "No problem , explain to me what you want to download",
+      "time": "12:53",
+      "type": "bot",
     }
   ];
   //sending message fn api

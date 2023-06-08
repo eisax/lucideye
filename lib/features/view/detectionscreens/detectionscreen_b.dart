@@ -1,13 +1,12 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:lucideye/features/view/detectionscreens/cameraoverlay.dart';
 import 'package:lucideye/main.dart';
 import '../../../constants/colors.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
-
 
 class DetectionScreen_b extends StatefulWidget {
   const DetectionScreen_b({super.key});
@@ -22,22 +21,20 @@ class _DetectionScreen_bState extends State<DetectionScreen_b> {
   late CameraController _cameraController;
   CameraImage? imgCamera;
   bool isWorking = false;
-
+  late Uint8List _imageBytes;
   //TEXT READING VARIABLES
   final textRecognizer = TextRecognizer();
-  String recognizedText = "";
+  String? recognizedText;
+  bool scanning = false;
 
   //CAMERA FUNCTIONS
-  _initializeCamera() {
+  _initializeCamera() async {
     _cameraController = CameraController(cameras[0], ResolutionPreset.max);
     _cameraController.initialize().then((value) {
       if (!mounted) {
         return;
       }
-      setState(() {
-        
-        
-      });
+      setState(() {});
     }).catchError((Object e) {
       if (e is CameraException) {
         print("CAMERA FAILED ZVEKUTODAROoox");
@@ -47,23 +44,28 @@ class _DetectionScreen_bState extends State<DetectionScreen_b> {
 
   //TAKING IMAGE TO BE SCANNED
   Future<void> _scanImage() async {
-   if (_cameraController != null && _cameraController.value.isInitialized) {
-    try {
-      final XFile pictureFile = await _cameraController.takePicture();
-      // final file = File(pictureFile.path);
-      // final inputImage = InputImage.fromFile(file);
-      // recognizedText = await textRecognizer.processImage(inputImage).toString();
-      print("=============DONE SCANNING===============");
-      //
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content:
-              Text('An error occurred when scanning text, please try again'),
-        ),
-      );
+    if (_cameraController != null && _cameraController.value.isInitialized) {
+      try {
+        // XFile pictureFile = await _cameraController.takePicture();
+        // Uint8List bytes = await pictureFile.readAsBytes();
+        if (_cameraController == null) return;
+
+        final pictureFile = await _cameraController!.takePicture();
+        final file = File(pictureFile.path);
+        final inputImage = InputImage.fromFile(file);
+        final recognizedTextIn = await textRecognizer.processImage(inputImage);
+        setState(() {
+          recognizedText = recognizedTextIn.text;
+        });
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+                'An error occurred when scanning text, please try again\nAn error occurred when scanning text, please try again\nAn error occurred when scanning text, please try again\nAn error occurred when scanning text, please try again\nAn error occurred when scanning text, please try again\nAn error occurred when scanning text, please try again\nAn error occurred when scanning text, please try again\nAn error occurred when scanning text, please try again\nAn error occurred when scanning text, please try again\nAn error occurred when scanning text, please try again\nAn error occurred when scanning text, please try again\nAn error occurred when scanning text, please try again\nAn error occurred when scanning text, please try again\nAn error occurred when scanning text, please try again\nAn error occurred when scanning text, please try again\nAn error occurred when scanning text, please try again\n'),
+          ),
+        );
+      }
     }
-   }
   }
 
   @override
@@ -110,106 +112,136 @@ class _DetectionScreen_bState extends State<DetectionScreen_b> {
                               },
                               onDoubleTap: () {
                                 _scanImage();
+                                setState(() {
+                                  scanning = true;
+                                });
                                 print('Double tap');
                               },
                               onLongPress: () {
                                 print('Long press');
                               },
                               child: QRScannerOverlay(
-                                  scanAreaRadius: 20,
+                                  scanAreaRadius: 1,
                                   overlayColour: Colors.black.withOpacity(0.5),
-                                  lineColor: Colors.black.withOpacity(0.5),
+                                  lineColor: mainColor.withOpacity(0.5),
                                   scanAreaHeight: displayHeight * 0.65,
                                   scanAreaWidth: displayWidth * 0.7),
                             ),
-                            recognizedText !=""?
-                            Positioned(
-                                child: Center(
-                              child: Container(
-                                width: displayWidth * 0.75 - 35,
-                                height: displayHeight * 0.65 - 25,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: [
-                                      Colors.white.withOpacity(0.7),
-                                      Colors.grey.withOpacity(0.3),
-                                    ],
-                                  ),
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: Container(
+                            scanning
+                                ? Positioned(
+                                    child: Center(
+                                    child: Container(
+                                      width: displayWidth * 0.75 - 35,
+                                      height: displayHeight * 0.65 - 25,
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(10),
                                         gradient: LinearGradient(
                                           begin: Alignment.topLeft,
                                           end: Alignment.bottomRight,
                                           colors: [
-                                            Colors.grey.withOpacity(0.3),
                                             Colors.white.withOpacity(0.7),
+                                            Colors.grey.withOpacity(0.3),
                                           ],
                                         ),
                                       ),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          Container(
-                                            width: displayWidth * 0.2,
-                                            height: displayHeight * 0.1,
-                                            child: Image.asset(
-                                                "assets/neural.png"),
-                                          ),
-                                          Container(
-                                            width: displayWidth * 0.7,
-                                            height: displayHeight * 0.1,
-                                            child: Center(
-                                              child: Text(
-                                                recognizedText,
-                                                style: TextStyle(
-                                                    fontSize: 15,
-                                                    color: white,
-                                                    fontWeight:
-                                                        FontWeight.bold),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              gradient: LinearGradient(
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomRight,
+                                                colors: [
+                                                  Colors.grey.withOpacity(0.3),
+                                                  Colors.white.withOpacity(0.7),
+                                                ],
                                               ),
                                             ),
-                                          ),
-                                          Container(
-                                            width: displayWidth * 0.7,
-                                            height: displayHeight * 0.32,
-                                            color: mainColor,
-                                          ),
-                                          Container(
-                                            width: displayWidth * 0.7,
-                                            child: TextButton(
-                                                onPressed: () {},
-                                                child: Text(
-                                                  'Rescan',
-                                                  style: TextStyle(
-                                                      fontSize: 20,
-                                                      color: mainColor,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                )),
-                                          )
-                                        ],
-                                      )),
-                                ),
-                              ),
-                            ))
-                            :Container()
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceEvenly,
+                                              children: [
+                                                SizedBox(
+                                                  width: displayWidth * 0.2,
+                                                  height: displayHeight * 0.1,
+                                                  child: Image.asset(
+                                                      "assets/neural.png"),
+                                                ),
+                                                Expanded(
+                                                  child: Container(
+                                                    width: displayWidth * 0.7,
+                                                    height:
+                                                        displayHeight * 0.32,
+                                                    // color: mainColor,
+                                                    padding:
+                                                        const EdgeInsets.all(5),
+                                                    child:
+                                                       recognizedText != "" && recognizedText != null
+                                                            ? Text(
+                                                                recognizedText
+                                                                    .toString(),
+                                                                style: const TextStyle(
+                                                                    fontSize:
+                                                                        12,
+                                                                    color:
+                                                                        primaryColor,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
+                                                              )
+                                                            : Center(
+                                                                child:
+                                                                    Container(
+                                                                  width: 50,
+                                                                  height: 50,
+                                                                  child:
+                                                                      const CircularProgressIndicator(
+                                                                    valueColor:
+                                                                        AlwaysStoppedAnimation<Color>(
+                                                                            mainColor),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                  ),
+                                                ),
+                                                Container(
+                                                  width: displayWidth * 0.7,
+                                                  color: mainColor,
+                                                  child: TextButton(
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        scanning = false;
+                                                        recognizedText =null;
+                                                      });
+                                                    },
+                                                    child: Text(
+                                                      'Rescan',
+                                                      style: TextStyle(
+                                                          fontSize: 12,
+                                                          color: white,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                  ),
+                                                )
+                                              ],
+                                            )),
+                                      ),
+                                    ),
+                                  ))
+                                : Container()
                           ],
                         )
                       : Center(
                           child: Container(
-                              width: 50,
-                              height: 50,
-                              child: CircularProgressIndicator(
-                                  valueColor:
-                                      AlwaysStoppedAnimation<Color>(greyd))),
+                            width: 50,
+                            height: 50,
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(greyd),
+                            ),
+                          ),
                         ),
                 ),
               )

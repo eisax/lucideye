@@ -93,13 +93,25 @@ class _DetectionScreen_cState extends State<DetectionScreen_c> {
                                 child: CameraPreview(_cameraController),
                               ),
                             ),
-                            Positioned(
-                              child: QRScannerOverlay(
-                                scanAreaRadius: 20,
-                                overlayColour: Colors.black.withOpacity(0.5),
-                                lineColor: Colors.black.withOpacity(0.5),
-                                scanAreaHeight:displayHeight*0.3,
-                                scanAreaWidth:displayWidth*0.85
+                            GestureDetector(
+                              onTap: () {
+                                print('Single tap');
+                              },
+                              onDoubleTap: () {
+                                
+                                print('Double tap');
+                              },
+                              onLongPress: () {
+                                print('Long press');
+                              },
+                              child: Positioned(
+                                child: QRScannerOverlay(
+                                  scanAreaRadius: 1,
+                                  overlayColour: Colors.black.withOpacity(0.5),
+                                  lineColor: mainColor,
+                                  scanAreaHeight:displayHeight*0.3,
+                                  scanAreaWidth:displayWidth*0.85
+                                ),
                               ),
                             ),
                           ],
