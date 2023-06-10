@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:clay_containers/clay_containers.dart';
-import 'package:lucideye/features/view/assistantscreen.dart';
+import 'package:lucideye/config/navigations.dart';
+import 'package:lucideye/features/view/emergencyscreen.dart';
 import '../../constants/colors.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -9,14 +10,14 @@ import 'package:location/location.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/plugin_api.dart';
 
-class EmergencyScreen extends StatefulWidget {
-  const EmergencyScreen({super.key});
+class AssistantScreen extends StatefulWidget {
+  const AssistantScreen({super.key});
 
   @override
-  State<EmergencyScreen> createState() => _EmergencyScreenState();
+  State<AssistantScreen> createState() => _AssistantScreenState();
 }
 
-class _EmergencyScreenState extends State<EmergencyScreen> {
+class _AssistantScreenState extends State<AssistantScreen> {
   final apiKey = "5b3ce3597851110001cf62482ba1a7913a98486e919d38677db5c78f";
   late LatLng startPoint = LatLng(-17.8250, 31.0488);
   final LatLng endPoint = LatLng(-17.3594, 30.1815);
@@ -30,6 +31,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
   String? _serviceError = '';
   int interActiveFlags = InteractiveFlag.all;
   double zoomLevel = 15;
+  bool amActive = false;
 
   void initLocationService() async {
     await _locationService.changeSettings(
@@ -136,7 +138,102 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
         elevation: 0,
         backgroundColor: mainColor,
         leading: IconButton(
-          onPressed: () {},
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  content: Container(
+                    width: displayWidth * 0.5,
+                    height: displayWidth * 0.4,
+                    decoration: BoxDecoration(
+                        color: white, borderRadius: BorderRadius.circular(15)),
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            width: displayWidth * 0.55,
+                            margin: EdgeInsets.only(bottom: 10),
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: mainColor,
+                                width: 1.0,
+                                style: BorderStyle.solid,
+                              ),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Icon(Icons.location_on, color: Colors.green),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Chitungwiza, Zimbabwe",
+                                      style: const TextStyle(
+                                          color: mainColor,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(
+                                        'Chitungwiza, \nMashonaland East Province, \nZimbabwe',
+                                        style: const TextStyle(
+                                            color: greyc,
+                                            fontSize: 8,
+                                            fontWeight: FontWeight.w400))
+                                  ],
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {},
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                shadowColor: greyd,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                minimumSize: Size(displayWidth * 0.25, 40),
+                              ),
+                              child: Text(
+                                'Decline',
+                                style: TextStyle(
+                                    fontSize: 16, color: Colors.white),
+                              ),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {},
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green,
+                                shadowColor: greyd,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                minimumSize: Size(displayWidth * 0.25, 40),
+                              ),
+                              child: Text(
+                                'Accept',
+                                style: TextStyle(
+                                    fontSize: 16, color: Colors.white),
+                              ),
+                            )
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
+          },
           icon: const Icon(
             Icons.menu,
             size: 20,
@@ -145,7 +242,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
         ),
         title: Center(
           child: Text(
-            'Emergency',
+            'Assistant',
             style: TextStyle(
                 fontSize: 10, color: primaryColor, fontWeight: FontWeight.bold),
           ),
@@ -165,97 +262,95 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
           IconButton(
             onPressed: () {
               showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    content: Container(
-                      width: displayWidth * 0.5,
-                      height: displayWidth * 0.4,
-                      decoration: BoxDecoration(
-                          color: white,
-                          borderRadius: BorderRadius.circular(15)),
-                      child: Column(
-                        children: [
-                          Expanded(
-                            child: Container(
-                              width: displayWidth * 0.55,
-                              margin: EdgeInsets.only(bottom: 10),
-                              padding: EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: mainColor,
-                                  width: 1.0,
-                                  style: BorderStyle.solid,
-                                ),
-                                borderRadius: BorderRadius.circular(10),
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  content: Container(
+                    width: displayWidth * 0.5,
+                    height: displayWidth * 0.4,
+                    decoration: BoxDecoration(
+                        color: white, borderRadius: BorderRadius.circular(15)),
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            width: displayWidth * 0.55,
+                            margin: EdgeInsets.only(bottom: 10),
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: mainColor,
+                                width: 1.0,
+                                style: BorderStyle.solid,
                               ),
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Text(
-                                    "My Helpline ID",
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Text(
+                                "My Assistance ID",
+                                style: const TextStyle(
+                                    color: mainColor,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                                Center(
+                                  child: Text(
+                                    "xfdhg658sb",
                                     style: const TextStyle(
-                                        color: mainColor,
-                                        fontSize: 15,
+                                        color: Colors.red,
+                                        fontSize: 10,
                                         fontWeight: FontWeight.bold),
                                   ),
-                                  Center(
-                                    child: Text(
-                                      "xfdhg658sb",
-                                      style: const TextStyle(
-                                          color: Colors.red,
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              ElevatedButton(
-                                onPressed: () {},
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red,
-                                  shadowColor: greyd,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  minimumSize: Size(displayWidth * 0.25, 40),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {},
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                shadowColor: greyd,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                                child: Text(
-                                  'Cancel',
-                                  style: TextStyle(
-                                      fontSize: 16, color: Colors.white),
-                                ),
+                                minimumSize: Size(displayWidth * 0.25, 40),
                               ),
-                              ElevatedButton(
-                                onPressed: () {},
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.green,
-                                  shadowColor: greyd,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  minimumSize: Size(displayWidth * 0.25, 40),
+                              child: Text(
+                                'Cancel',
+                                style: TextStyle(
+                                    fontSize: 16, color: Colors.white),
+                              ),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {},
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green,
+                                shadowColor: greyd,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                                child: Text(
-                                  'Generate',
-                                  style: TextStyle(
-                                      fontSize: 16, color: Colors.white),
-                                ),
-                              )
-                            ],
-                          )
-                        ],
-                      ),
+                                minimumSize: Size(displayWidth * 0.25, 40),
+                              ),
+                              child: Text(
+                                'Generate',
+                                style: TextStyle(
+                                    fontSize: 16, color: Colors.white),
+                              ),
+                            )
+                          ],
+                        )
+                      ],
                     ),
-                  );
-                },
-              );
+                  ),
+                );
+              },
+            );
             },
             icon: const Icon(
               Icons.info_outline,
@@ -267,7 +362,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => AssistantScreen()),
+                MaterialPageRoute(builder: (context) => NavigationBarScreen()),
               );
             },
             icon: const Icon(
@@ -392,46 +487,59 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  //this is the third bar with start button
                   Container(
                     width: displayWidth,
                     height: displayHeight * 0.45,
                     child: Stack(
                       children: [
+                        //BUTTON
+
                         Center(
                           child: ClayContainer(
                             color: white,
-                            height: displayHeight * 0.28 * 0.6,
-                            width: displayHeight * 0.28 * 0.6,
-                            borderRadius: displayHeight * 0.28 * 0.5 * 0.5,
+                            height: displayHeight * 0.28 * 0.6 * 0.5,
+                            width: displayHeight * 0.28 * 0.6 * 0.5,
+                            borderRadius:
+                                displayHeight * 0.28 * 0.5 * 0.5 * 0.5,
                             curveType: CurveType.concave,
                             child: Stack(
                               children: [
                                 Center(
                                   child: Container(
-                                    height: displayHeight * 0.24 * 0.6,
-                                    width: displayHeight * 0.24 * 0.6,
+                                    height: displayHeight * 0.24 * 0.6 * 0.5,
+                                    width: displayHeight * 0.24 * 0.6 * 0.5,
                                     decoration: BoxDecoration(
-                                        color: red,
+                                        color: amActive ? Colors.green : red,
                                         borderRadius: BorderRadius.circular(
                                             displayHeight * 0.24 * 0.5 * 0.6)),
                                     child: Stack(
                                       children: [
                                         Center(
                                           child: ClayContainer(
-                                            color: red,
-                                            height: displayHeight * 0.21 * 0.6,
-                                            width: displayHeight * 0.21 * 0.6,
-                                            borderRadius:
-                                                displayHeight * 0.24 * 0.5,
+                                            color:
+                                                amActive ? Colors.green : red,
+                                            height: displayHeight *
+                                                0.21 *
+                                                0.6 *
+                                                0.5,
+                                            width: displayHeight *
+                                                0.21 *
+                                                0.6 *
+                                                0.5,
+                                            borderRadius: displayHeight *
+                                                0.24 *
+                                                0.5 *
+                                                0.5,
                                             curveType: CurveType.convex,
                                             child: IconButton(
                                               onPressed: () {
                                                 initLocationService();
-                                                _getRoutePoints();
+                                                setState(() {
+                                                  amActive = !amActive;
+                                                });
                                               },
                                               icon: Icon(
-                                                Icons.sos_sharp,
+                                                Icons.power,
                                                 size:
                                                     displayHeight * 0.05 * 0.5,
                                                 color: white,
@@ -447,6 +555,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                             ),
                           ),
                         ),
+                        //BUTTON
                       ],
                     ),
                   )

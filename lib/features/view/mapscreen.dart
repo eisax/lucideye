@@ -162,78 +162,8 @@ class _MapScreenState extends State<MapScreen> {
     }
     return Scaffold(
       key: _scaffoldKey,
-      // drawer: Stack(
-      //   children: [
-      //     SafeArea(
-      //       child: Center(
-      //         child: Text('Content'),
-      //       ),
-      //     ),
-      //     Positioned(
-      //       top: 25,
-      //       right: 15,
-      //       bottom: MediaQuery.of(context).size.height *0.3,
-      //       child: Container(
-      //         width: MediaQuery.of(context).size.width / 2,
-      //         height: MediaQuery.of(context).size.height *0.6,
-      //         color: mainColor,
-      //         child: ListTileTheme(
-      //           textColor: Colors.white,
-      //           iconColor: Colors.white,
-      //           child: Column(
-      //             mainAxisSize: MainAxisSize.max,
-      //             children: [
-      //               Container(
-      //                 width: 100.0,
-      //                 height: 100.0,
-      //                 margin: const EdgeInsets.only(
-      //                   top: 5.0,
-      //                   bottom: 5.0,
-      //                 ),
-      //                 clipBehavior: Clip.antiAlias,
-      //                 decoration: const BoxDecoration(
-      //                   color: white,
-      //                   shape: BoxShape.circle,
-      //                 ),
-      //                 child: Image.asset(
-      //                   'assets/logo.png',
-      //                 ),
-      //               ),
-      //               ListTile(
-      //                 onTap: () {},
-      //                 leading: Icon(Icons.home),
-      //                 title: Text('How it works?'),
-      //               ),
-      //               ListTile(
-      //                 onTap: () {},
-      //                 leading: Icon(Icons.home),
-      //                 title: Text('Support'),
-      //               ),
-      //               ListTile(
-      //                 onTap: () {},
-      //                 leading: Icon(Icons.home),
-      //                 title: Text('Settings'),
-      //               ),
-      //               Spacer(),
-      //               DefaultTextStyle(
-      //                 style: TextStyle(
-      //                   fontSize: 12,
-      //                   color: Colors.white54,
-      //                 ),
-      //                 child: Container(
-      //                   margin: const EdgeInsets.symmetric(
-      //                     vertical: 16.0,
-      //                   ),
-      //                   child: Text('Terms of Service | Privacy Policy'),
-      //                 ),
-      //               )
-      //             ],
-      //           ),
-      //         ),
-      //       ),
-      //     ),
-      //   ],
-      // ),
+      
+     
       body: RefreshIndicator(
         onRefresh: () async {
           await _getRoutePoints();
