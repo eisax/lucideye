@@ -10,6 +10,8 @@ import 'package:open_route_service/open_route_service.dart';
 import 'package:location/location.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:geocoder/geocoder.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -26,6 +28,7 @@ class _MapScreenState extends State<MapScreen> {
   final Location _locationService = Location();
   late final MapController _mapController;
   TextEditingController _searchcontroller = TextEditingController();
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   LocationData? _currentLocation;
   late LatLng currentLatLng;
   List<LatLng> routePoints = [];
@@ -38,7 +41,7 @@ class _MapScreenState extends State<MapScreen> {
   double zoomLevel = 17;
   final FitBoundsOptions options =
       const FitBoundsOptions(padding: EdgeInsets.all(0));
-
+  double? lengthInMeters;
   void initLocationService() async {
     await _locationService.changeSettings(
       accuracy: LocationAccuracy.high,
@@ -119,6 +122,17 @@ class _MapScreenState extends State<MapScreen> {
               (coordinate) => LatLng(coordinate.latitude, coordinate.longitude))
           .toList();
       print("=======================================ROUTE POINTS DONE");
+      List<String> coordinateStrings = routePoints
+          .map((latLng) => '${latLng.latitude},${latLng.longitude}')
+          .toList();
+      String url =
+          'https://api.openrouteservice.org/v2/directions/foot-walking?api_key=$apiKey&coordinates=${coordinateStrings.join('|')}';
+      http.Response response = await http.get(Uri.parse(url));
+      Map<String, dynamic> jsonResponse = json.decode(response.body);
+      setState(() {
+        lengthInMeters = jsonResponse['features'][0]['properties']['segments']
+            [0]['distance'];
+      });
     } catch (e) {
       print("=======================================ROUTE POINTS FAILED");
     }
@@ -147,6 +161,79 @@ class _MapScreenState extends State<MapScreen> {
       // currentLatLng = LatLng(0, 0);
     }
     return Scaffold(
+      key: _scaffoldKey,
+      // drawer: Stack(
+      //   children: [
+      //     SafeArea(
+      //       child: Center(
+      //         child: Text('Content'),
+      //       ),
+      //     ),
+      //     Positioned(
+      //       top: 25,
+      //       right: 15,
+      //       bottom: MediaQuery.of(context).size.height *0.3,
+      //       child: Container(
+      //         width: MediaQuery.of(context).size.width / 2,
+      //         height: MediaQuery.of(context).size.height *0.6,
+      //         color: mainColor,
+      //         child: ListTileTheme(
+      //           textColor: Colors.white,
+      //           iconColor: Colors.white,
+      //           child: Column(
+      //             mainAxisSize: MainAxisSize.max,
+      //             children: [
+      //               Container(
+      //                 width: 100.0,
+      //                 height: 100.0,
+      //                 margin: const EdgeInsets.only(
+      //                   top: 5.0,
+      //                   bottom: 5.0,
+      //                 ),
+      //                 clipBehavior: Clip.antiAlias,
+      //                 decoration: const BoxDecoration(
+      //                   color: white,
+      //                   shape: BoxShape.circle,
+      //                 ),
+      //                 child: Image.asset(
+      //                   'assets/logo.png',
+      //                 ),
+      //               ),
+      //               ListTile(
+      //                 onTap: () {},
+      //                 leading: Icon(Icons.home),
+      //                 title: Text('How it works?'),
+      //               ),
+      //               ListTile(
+      //                 onTap: () {},
+      //                 leading: Icon(Icons.home),
+      //                 title: Text('Support'),
+      //               ),
+      //               ListTile(
+      //                 onTap: () {},
+      //                 leading: Icon(Icons.home),
+      //                 title: Text('Settings'),
+      //               ),
+      //               Spacer(),
+      //               DefaultTextStyle(
+      //                 style: TextStyle(
+      //                   fontSize: 12,
+      //                   color: Colors.white54,
+      //                 ),
+      //                 child: Container(
+      //                   margin: const EdgeInsets.symmetric(
+      //                     vertical: 16.0,
+      //                   ),
+      //                   child: Text('Terms of Service | Privacy Policy'),
+      //                 ),
+      //               )
+      //             ],
+      //           ),
+      //         ),
+      //       ),
+      //     ),
+      //   ],
+      // ),
       body: RefreshIndicator(
         onRefresh: () async {
           await _getRoutePoints();
@@ -285,12 +372,17 @@ class _MapScreenState extends State<MapScreen> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   IconButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      Scaffold.of(context).openDrawer();
+                                      _scaffoldKey.currentState?.openDrawer();
+                                      print("open drawer");
+                                    },
                                     icon: const Icon(
                                       Icons.menu,
                                       size: 30,
                                     ),
                                   ),
+                                  
                                   Container(
                                     width: 35,
                                     height: 35,
@@ -404,7 +496,8 @@ class _MapScreenState extends State<MapScreen> {
           return ListTile(
             title: Text(
               address.addressLine,
-              style: const TextStyle(color: mainColor, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                  color: mainColor, fontWeight: FontWeight.bold),
             ),
             subtitle: Text(
               '${address.locality}, ${address.adminArea} ${address.postalCode}, ${address.countryName}',

@@ -19,7 +19,7 @@ class DetectionScreen extends StatelessWidget {
         controller: _pageController,
         scrollDirection: Axis.vertical, // Set scroll direction to vertical
         children: [
-          // DetectionScreen_a(),
+          DetectionScreen_a(),
           DetectionScreen_b(),
           DetectionScreen_c(),
           

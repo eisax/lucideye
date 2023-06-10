@@ -157,83 +157,107 @@ class _DetectionScreen_aState extends State<DetectionScreen_a> {
                             ),
                             result == ""
                                 ? Container()
-                                : Positioned(
-                                    child: Center(
+                                : 
+                            Positioned(
+                              child: Center(
+                                child: Container(
+                                  width: displayWidth * 0.75 - 35,
+                                  height: displayWidth * 0.75 - 25,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        Colors.white.withOpacity(0.7),
+                                        Colors.grey.withOpacity(0.3),
+                                      ],
+                                    ),
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
                                     child: Container(
-                                      width: displayWidth * 0.75 - 25,
-                                      height: displayWidth * 0.75 - 25,
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(10),
                                         gradient: LinearGradient(
                                           begin: Alignment.topLeft,
                                           end: Alignment.bottomRight,
                                           colors: [
-                                            Colors.white.withOpacity(0.7),
                                             Colors.grey.withOpacity(0.3),
+                                            Colors.white.withOpacity(0.7),
                                           ],
                                         ),
                                       ),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(10),
-                                        child: Container(
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              gradient: LinearGradient(
-                                                begin: Alignment.topLeft,
-                                                end: Alignment.bottomRight,
-                                                colors: [
-                                                  Colors.grey.withOpacity(0.3),
-                                                  Colors.white.withOpacity(0.7),
-                                                ],
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          SizedBox(
+                                            width: displayWidth * 0.1,
+                                            height: displayHeight * 0.1,
+                                            child: Image.asset(
+                                                "assets/neural.png"),
+                                          ),
+                                          Expanded(
+                                            child: Container(
+                                              width: displayWidth * 0.7,
+                                              height: displayHeight * 0.32,
+                                              // color: mainColor,
+                                              padding: const EdgeInsets.all(10),
+                                              child: result != "" &&
+                                                      result != null
+                                                  ? SingleChildScrollView(
+                                                    child: Text(
+                                                        result.toString(),
+                                                        style: const TextStyle(
+                                                            fontSize: 12,
+                                                            color: primaryColor,
+                                                            fontWeight:
+                                                                FontWeight.bold),
+                                                      ),
+                                                  )
+                                                  : Center(
+                                                      child: Container(
+                                                        width: 50,
+                                                        height: 50,
+                                                        child:
+                                                            const CircularProgressIndicator(
+                                                          valueColor:
+                                                              AlwaysStoppedAnimation<
+                                                                      Color>(
+                                                                  mainColor),
+                                                        ),
+                                                      ),
+                                                    ),
+                                            ),
+                                          ),
+                                          Container(
+                                            width: displayWidth * 0.85,
+                                            color: mainColor,
+                                            child: TextButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  
+                                                  result = "";
+                                                });
+                                              },
+                                              child: Text(
+                                                'Rescan',
+                                                style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: white,
+                                                    fontWeight:
+                                                        FontWeight.bold),
                                               ),
                                             ),
-                                            child: Column(
-                                              children: [
-                                                Container(
-                                                  width: displayWidth * 0.2,
-                                                  height: displayWidth * 0.2,
-                                                  child: Image.asset(
-                                                      "assets/neural.png"),
-                                                ),
-                                                Container(
-                                                  width: displayWidth * 0.7,
-                                                  height: displayWidth * 0.1,
-                                                  child: Center(
-                                                    child: Text(
-                                                      _newVoiceText,
-                                                      style: TextStyle(
-                                                          fontSize: 15,
-                                                          color: white,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                  ),
-                                                ),
-                                                Container(
-                                                  width: displayWidth * 0.7,
-                                                  height: displayWidth * 0.25,
-                                                  color: mainColor,
-                                                ),
-                                                Container(
-                                                  width: displayWidth * 0.7,
-                                                  child: TextButton(
-                                                      onPressed: () {},
-                                                      child: Text(
-                                                        'Cancel',
-                                                        style: TextStyle(
-                                                            fontSize: 20,
-                                                            color: mainColor,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold),
-                                                      )),
-                                                )
-                                              ],
-                                            )),
+                                          )
+                                        ],
                                       ),
                                     ),
-                                  )),
+                                  ),
+                                ),
+                              ),
+                            )
                           ],
                         )
                       : Center(

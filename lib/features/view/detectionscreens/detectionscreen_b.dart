@@ -61,7 +61,7 @@ class _DetectionScreen_bState extends State<DetectionScreen_b> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
-                'An error occurred when scanning text, please try again\nAn error occurred when scanning text, please try again\nAn error occurred when scanning text, please try again\nAn error occurred when scanning text, please try again\nAn error occurred when scanning text, please try again\nAn error occurred when scanning text, please try again\nAn error occurred when scanning text, please try again\nAn error occurred when scanning text, please try again\nAn error occurred when scanning text, please try again\nAn error occurred when scanning text, please try again\nAn error occurred when scanning text, please try again\nAn error occurred when scanning text, please try again\nAn error occurred when scanning text, please try again\nAn error occurred when scanning text, please try again\nAn error occurred when scanning text, please try again\nAn error occurred when scanning text, please try again\n'),
+                'An error occurred when scanning text, please try again'),
           ),
         );
       }
@@ -130,23 +130,25 @@ class _DetectionScreen_bState extends State<DetectionScreen_b> {
                             scanning
                                 ? Positioned(
                                     child: Center(
-                                    child: Container(
-                                      width: displayWidth * 0.75 - 35,
-                                      height: displayHeight * 0.65 - 25,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        gradient: LinearGradient(
-                                          begin: Alignment.topLeft,
-                                          end: Alignment.bottomRight,
-                                          colors: [
-                                            Colors.white.withOpacity(0.7),
-                                            Colors.grey.withOpacity(0.3),
-                                          ],
+                                      child: Container(
+                                        width: displayWidth * 0.75 - 35,
+                                        height: displayHeight * 0.65 - 25,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                            colors: [
+                                              Colors.white.withOpacity(0.7),
+                                              Colors.grey.withOpacity(0.3),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(10),
-                                        child: Container(
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          child: Container(
                                             decoration: BoxDecoration(
                                               borderRadius:
                                                   BorderRadius.circular(10),
@@ -176,34 +178,37 @@ class _DetectionScreen_bState extends State<DetectionScreen_b> {
                                                         displayHeight * 0.32,
                                                     // color: mainColor,
                                                     padding:
-                                                        const EdgeInsets.all(5),
-                                                    child:
-                                                       recognizedText != "" && recognizedText != null
-                                                            ? Text(
-                                                                recognizedText
-                                                                    .toString(),
-                                                                style: const TextStyle(
-                                                                    fontSize:
-                                                                        12,
-                                                                    color:
-                                                                        primaryColor,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold),
-                                                              )
-                                                            : Center(
-                                                                child:
-                                                                    Container(
-                                                                  width: 50,
-                                                                  height: 50,
-                                                                  child:
-                                                                      const CircularProgressIndicator(
-                                                                    valueColor:
-                                                                        AlwaysStoppedAnimation<Color>(
-                                                                            mainColor),
-                                                                  ),
-                                                                ),
+                                                        const EdgeInsets.all(10),
+                                                    child: recognizedText !=
+                                                                "" &&
+                                                            recognizedText !=
+                                                                null
+                                                        ? SingleChildScrollView(
+                                                          child: Text(
+                                                              recognizedText
+                                                                  .toString(),
+                                                              style: const TextStyle(
+                                                                  fontSize: 12,
+                                                                  color:
+                                                                      primaryColor,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                            ),
+                                                        )
+                                                        : Center(
+                                                            child: Container(
+                                                              width: 50,
+                                                              height: 50,
+                                                              child:
+                                                                  const CircularProgressIndicator(
+                                                                valueColor:
+                                                                    AlwaysStoppedAnimation<
+                                                                            Color>(
+                                                                        mainColor),
                                                               ),
+                                                            ),
+                                                          ),
                                                   ),
                                                 ),
                                                 Container(
@@ -213,7 +218,7 @@ class _DetectionScreen_bState extends State<DetectionScreen_b> {
                                                     onPressed: () {
                                                       setState(() {
                                                         scanning = false;
-                                                        recognizedText =null;
+                                                        recognizedText = null;
                                                       });
                                                     },
                                                     child: Text(
@@ -227,10 +232,12 @@ class _DetectionScreen_bState extends State<DetectionScreen_b> {
                                                   ),
                                                 )
                                               ],
-                                            )),
+                                            ),
+                                          ),
+                                        ),
                                       ),
                                     ),
-                                  ))
+                                  )
                                 : Container()
                           ],
                         )
@@ -250,7 +257,7 @@ class _DetectionScreen_bState extends State<DetectionScreen_b> {
                     top: displayHeight * 0.05, bottom: displayHeight * 0.15),
                 width: displayWidth,
                 height: displayHeight,
-                color: white,
+                color: mainColor,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -268,7 +275,7 @@ class _DetectionScreen_bState extends State<DetectionScreen_b> {
                             'Text Recognition',
                             style: TextStyle(
                                 fontSize: 30,
-                                color: greyd,
+                                color: primaryColor,
                                 fontWeight: FontWeight.bold),
                           ),
                           SizedBox(
@@ -276,7 +283,7 @@ class _DetectionScreen_bState extends State<DetectionScreen_b> {
                           ),
                           Text(
                             'Shake your phone or press start to start your camera',
-                            style: TextStyle(fontSize: 18, color: greyb),
+                            style: TextStyle(fontSize: 18, color: primaryColor),
                           )
                         ],
                       ),
@@ -299,7 +306,7 @@ class _DetectionScreen_bState extends State<DetectionScreen_b> {
                                   painter: BorderPainter(),
                                   child: Container(
                                     width: displayHeight * 0.3 * 0.75,
-                                    height: displayHeight * 0.3 * 0.75,
+                                    height: displayHeight * 0.3,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(20),
                                     ),
@@ -307,14 +314,14 @@ class _DetectionScreen_bState extends State<DetectionScreen_b> {
                                       children: [
                                         Center(
                                           child: Container(
-                                            width: displayHeight * 0.1 * 0.75,
-                                            height: displayHeight * 0.1 * 0.75,
+                                            width: displayHeight * 0.1 * 0.8,
+                                            height: displayHeight * 0.1,
                                             decoration: BoxDecoration(
                                               color: greya.withOpacity(0.7),
                                               borderRadius:
                                                   BorderRadius.circular(10),
                                               border: Border.all(
-                                                color: greyd,
+                                                color: primaryColor,
                                                 width: 1,
                                               ),
                                             ),
@@ -339,7 +346,7 @@ class _DetectionScreen_bState extends State<DetectionScreen_b> {
                           });
                         },
                         style: ElevatedButton.styleFrom(
-                          primary: greyd,
+                          backgroundColor: primaryColor,
                           shadowColor: greyd,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15),
@@ -368,7 +375,7 @@ class BorderPainter extends CustomPainter {
     double cornerSide = sh * 0.1;
 
     Paint paint = Paint()
-      ..color = greyd
+      ..color = primaryColor
       ..strokeWidth = 2.0
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
