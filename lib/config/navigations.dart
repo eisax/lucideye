@@ -1,9 +1,18 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:lucideye/constants/colors.dart';
 import 'package:lucideye/features/view/chatbotscreen.dart';
 import 'package:lucideye/features/view/mapscreen.dart';
 import 'package:lucideye/features/view/detectionscreen.dart';
 import 'package:lucideye/features/view/emergencyscreen.dart';
+import 'package:picovoice_flutter/picovoice_error.dart';
+import 'package:picovoice_flutter/picovoice_manager.dart';
+import 'package:rhino_flutter/rhino.dart';
+
+import '../time_date_models/date.dart';
+import '../time_date_models/time.dart';
 
 class NavigationBarScreen extends StatefulWidget {
   
@@ -15,6 +24,19 @@ class NavigationBarScreen extends StatefulWidget {
 }
 
 class _NavigationBarScreenState extends State<NavigationBarScreen> {
+
+  //Picovoice accesskey
+  String accessKey = 'msoa/qJ2l4nnbxf3cw/iu1xFPjSGDjom9j/8cjFpfmUWX5PHhlQROQ==';
+
+  final FlutterTts _flutterTts = FlutterTts();
+
+  bool isError = false;
+  String errorMessage = "";
+  bool listeningForCommand = false;
+  PicovoiceManager? _picovoiceManager;
+
+
+
   int _selectedIndex = 0;
 
   final List<Widget> _screens = [
@@ -29,6 +51,103 @@ class _NavigationBarScreenState extends State<NavigationBarScreen> {
       _selectedIndex = index;
     });
   }
+
+
+  void _initPicovoice() async {
+
+    print("============================PICOVOICE HAS INITIALIZED SUCCESSFULLY===================================");
+
+    String keywordAsset = "assets/picovoice_models/alexa_en_android_v2_2_0.ppn";
+    String contextAsset = "assets/picovoice_models/Screen-Navigations_en_android_v2_2_0.rhn";
+
+    try {
+      _picovoiceManager = await PicovoiceManager.create(accessKey, keywordAsset, _wakeWordCallback, contextAsset, _inferenceCallback, processErrorCallback: _errorCallback);
+      await _picovoiceManager?.start();
+    } on PicovoiceInvalidArgumentException catch (ex) {
+      _errorCallback(PicovoiceInvalidArgumentException(
+          "${ex.message}\nEnsure your accessKey '$accessKey' is a valid access key."));
+    } on PicovoiceActivationException {
+      _errorCallback(
+          PicovoiceActivationException("AccessKey activation error."));
+    } on PicovoiceActivationLimitException {
+      _errorCallback(PicovoiceActivationLimitException(
+          "AccessKey reached its device limit."));
+    } on PicovoiceActivationRefusedException {
+      _errorCallback(PicovoiceActivationRefusedException("AccessKey refused."));
+    } on PicovoiceActivationThrottledException {
+      _errorCallback(PicovoiceActivationThrottledException(
+          "AccessKey has been throttled."));
+    } on PicovoiceException catch (ex) {
+      _errorCallback(ex);
+    }
+  }
+
+  void _wakeWordCallback() {
+    setState(() {
+      listeningForCommand = true;
+    });
+  }
+
+  void _inferenceCallback(RhinoInference inference) {
+    print("============= RHINO INFERENCE: $inference===================");
+    if (inference.isUnderstood!) {
+      Map<String, String> slots = inference.slots!;
+      if (inference.intent == 'objectdetector') {
+        setState(() {
+          _onItemTapped(0);
+        });
+      } else if (inference.intent == '') {
+        setState(() {
+          _onItemTapped(3);
+        });
+      }else if (inference.intent == 'help') {
+        setState(() {
+          _onItemTapped(3);
+        });
+      }
+      }else if (inference.intent == 'date') {
+        setState(() {
+          GetDate().speakDate();
+        });
+      }else if (inference.intent == 'tommorrow') {
+        setState(() {
+          GetDate().speakTomorrowDate();
+        });
+      }else if (inference.intent == 'time') {
+        setState(() {
+          TimerTime().timer();
+        });
+      } else if (inference.intent == 'availableCommands') {
+        String availableCommands = "I am just a prototype, for a blind assistant and object detection app'\n - 'You'll get full features once my development is done'\n - 'For now just navigate between screens by saying Navigate to:, then mention the screen you want to go to'";
+        _flutterTts.speak(availableCommands);
+      } else {
+      String commandNotUnderstood = "I didn't understand your command! Please try again or go to help screen";
+      _flutterTts.speak(commandNotUnderstood);
+    }
+    setState(() {
+      listeningForCommand = false;
+    });
+  }
+
+  void _errorCallback(PicovoiceException error) {
+    setState(() {
+      isError = true;
+      errorMessage = error.message!;
+      String errorMessageTTs;
+      if(isError == true)
+      {
+        errorMessageTTs = errorMessage;
+        _flutterTts.speak(errorMessageTTs);
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _initPicovoice();
+  }
+
 
   @override
   Widget build(BuildContext context) {

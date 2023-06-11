@@ -27,6 +27,17 @@ class MyApp extends StatelessWidget {
 }
 
 Future<void> checkAndRequestPermissions() async {
+
+  // Check microphone permission
+  if (!(await Permission.microphone.isGranted)) {
+    await Permission.microphone.request();
+  }
+
+  // Check audio permission
+  if (!(await Permission.audio.isGranted)) {
+    await Permission.audio.request();
+  }
+
   // Check camera permission
   if (!(await Permission.camera.isGranted)) {
     await Permission.camera.request();

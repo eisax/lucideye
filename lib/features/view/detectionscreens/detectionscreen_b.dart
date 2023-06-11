@@ -9,7 +9,6 @@ import '../../../constants/colors.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 
 class DetectionScreen_b extends StatefulWidget {
-  const DetectionScreen_b({super.key});
 
   @override
   State<DetectionScreen_b> createState() => _DetectionScreen_bState();

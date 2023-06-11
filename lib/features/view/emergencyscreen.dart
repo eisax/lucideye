@@ -10,7 +10,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_map/plugin_api.dart';
 
 class EmergencyScreen extends StatefulWidget {
-  const EmergencyScreen({super.key});
 
   @override
   State<EmergencyScreen> createState() => _EmergencyScreenState();

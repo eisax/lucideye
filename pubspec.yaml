@@ -19,7 +19,8 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=2.19.3 <3.0.0'
+  sdk: '>=2.19.0 <3.0.0'
+
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -48,6 +49,12 @@ dependencies:
   permission_handler: ^10.2.0
   geocoder: ^0.2.1
   connectivity: ^3.0.6
+  picovoice_flutter: ^2.2.1
+  flutter_voice_processor: ^1.0.10
+  porcupine_flutter: ^2.2.0
+  rhino_flutter: ^2.2.1
+  flutter_tts: ^3.7.0
+
 
 dev_dependencies:
   flutter_test:
@@ -76,6 +83,7 @@ flutter:
   assets:
     - assets/
     - assets/aimodels/
+    - assets/picovoice_models/
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

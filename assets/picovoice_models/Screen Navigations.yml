@@ -1,0 +1,140 @@
+context:
+  expressions:
+    objectdetector:
+      - go to object detection
+      - navigate to object detection screen
+      - please go to object detection screen
+      - please navigate to object detection screen
+      - go to object detection screen
+      - navigate to object detection
+      - please go to object detection
+      - please navigate to object detection
+      - object detection
+    initiatecamera:
+      - initiate camera
+      - start camera
+      - please initiate camera
+      - start camera please
+      - please start camera
+      - initiate camera please
+      - initiate the camera
+      - start the camera
+      - please initiate the camera
+      - start the camera please
+      - please start the camera
+      - initiate the camera please
+    opticalcharacterrecognition:
+      - go to ocr
+      - text recognition
+      - please go to ocr
+      - please go to ocr screen
+      - go to ocr screen please
+      - navigate to optical character recognition
+      - navigate to ocr
+      - please navigate to optical character recognition
+      - go to text recognition
+      - go to optical character recognition
+      - ocr
+      - optical character recognition
+      - please navigate to ocr
+      - please navigate to text recognition
+    help:
+      - navigate to help
+      - go to help
+      - please go to help
+      - please navigate to help
+      - please navigate to help screen
+      - please go to help screen
+      - go to help screen
+      - navigate to help screen
+      - help
+      - help please
+      - please help
+    settings:
+      - navigate to S O S
+      - go to SOS
+      - navigate to SOS
+      - go to S O S
+      - SOS
+      - please navigate to SOS
+      - please go to S O S
+      - please navigate to S O S
+      - please go to emergency contacts
+    availableCommands:
+      - what can i say
+      - how does this application work
+      - what does this application do
+      - what does this app do
+      - how does this app work
+    introscreensnext:
+      - next
+      - next please
+      - next page
+      - next screen
+    introscreensskip:
+      - skip
+      - please skip
+      - skip please
+    stopcamera:
+      - stop camera
+      - close camera
+      - stop camera please
+      - close camera please
+      - please stop camera
+      - please close camera
+      - stop the camera
+      - close the camera
+      - stop the camera please
+      - close the camera please
+      - please stop the camera
+      - please the close camera
+    introscreendone:
+      - done
+      - proceed to splash screen
+    time:
+      - give me the time
+      - what time is it
+      - time please
+      - tell me the time
+      - tell me the time please
+      - please tell me the time
+      - time
+    date:
+      - what day is it today
+      - what is the date today
+      - what is the date
+      - give me the date
+      - date
+      - when is today
+      - what is today's date
+      - what is the day
+    tommorrow:
+      - what is the date tomorrow
+      - what is tomorrow's date
+    whoareyou:
+      - who are you
+      - what are you
+    sendmsg:
+      - send the emergency message
+      - send the SOS message
+      - I need help
+      - send the emergency message please
+      - send the S O S message
+      - send the S O S message please
+    currencydetector:
+      - go to currency detector
+      - currency detector
+      - navigate to currency detector
+      - please go to currency detector
+      - please navigate to currency detector
+      - navigate to currency detector please
+      - go to currency detector please
+      - navigate to currency detection
+      - go to currency detection
+  slots:
+    screens:
+      - home
+      - help
+      - search
+      - account
+  macros: {}
