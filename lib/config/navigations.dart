@@ -96,9 +96,13 @@ class _NavigationBarScreenState extends State<NavigationBarScreen> {
         setState(() {
           _onItemTapped(0);
         });
-      } else if (inference.intent == '') {
+      } else if (inference.intent == 'map_screen') {
         setState(() {
-          _onItemTapped(3);
+          _onItemTapped(1);
+        });
+      }else if (inference.intent == 'chatscreen') {
+        setState(() {
+          _onItemTapped(2);
         });
       }else if (inference.intent == 'help') {
         setState(() {

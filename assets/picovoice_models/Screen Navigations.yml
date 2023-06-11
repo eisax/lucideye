@@ -50,7 +50,7 @@ context:
       - help
       - help please
       - please help
-    settings:
+    sos:
       - navigate to S O S
       - go to SOS
       - navigate to SOS
@@ -66,15 +66,6 @@ context:
       - what does this application do
       - what does this app do
       - how does this app work
-    introscreensnext:
-      - next
-      - next please
-      - next page
-      - next screen
-    introscreensskip:
-      - skip
-      - please skip
-      - skip please
     stopcamera:
       - stop camera
       - close camera
@@ -88,9 +79,6 @@ context:
       - close the camera please
       - please stop the camera
       - please the close camera
-    introscreendone:
-      - done
-      - proceed to splash screen
     time:
       - give me the time
       - what time is it
@@ -114,13 +102,15 @@ context:
     whoareyou:
       - who are you
       - what are you
-    sendmsg:
-      - send the emergency message
-      - send the SOS message
-      - I need help
-      - send the emergency message please
-      - send the S O S message
-      - send the S O S message please
+    chatscreen:
+      - go to chat screen
+      - navigate to chat screen
+      - chat screen
+      - please go to chat screen
+      - please navigate to chat screen
+      - chat screen please
+      - go to chat screen please
+      - navigate to chat screen please
     currencydetector:
       - go to currency detector
       - currency detector
@@ -131,6 +121,15 @@ context:
       - go to currency detector please
       - navigate to currency detection
       - go to currency detection
+    map_screen:
+      - go to map screen please
+      - please go to map screen
+      - go to map screen
+      - map screen please
+      - map screen
+      - please navigate to map screen
+      - navigate to map screen please
+      - navigate to map screen
   slots:
     screens:
       - home
