@@ -12,6 +12,10 @@ import 'package:flutter_map/plugin_api.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter_tts/flutter_tts.dart';
+import 'package:flutter/gestures.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -19,6 +23,8 @@ class MapScreen extends StatefulWidget {
   @override
   State<MapScreen> createState() => _MapScreenState();
 }
+
+enum TtsState { playing, stopped, paused, continued }
 
 class _MapScreenState extends State<MapScreen> {
   final apiKey = "5b3ce3597851110001cf62482ba1a7913a98486e919d38677db5c78f";
@@ -42,6 +48,20 @@ class _MapScreenState extends State<MapScreen> {
   final FitBoundsOptions options =
       const FitBoundsOptions(padding: EdgeInsets.all(0));
   double? lengthInMeters;
+
+  
+
+
+    
+
+
+    
+    
+
+  
+
+  
+
   void initLocationService() async {
     await _locationService.changeSettings(
       accuracy: LocationAccuracy.high,
@@ -142,13 +162,24 @@ class _MapScreenState extends State<MapScreen> {
   void initState() {
     _mapController = MapController();
     initLocationService();
+    
+    
     super.initState();
+  }
+
+  @override
+  void dispose() async {
+    super.dispose();
+    
+    
+    print("=============removed===============");
   }
 
   @override
   Widget build(BuildContext context) {
     double displayWidth = MediaQuery.of(context).size.width;
     double displayHeight = MediaQuery.of(context).size.height;
+    // _currentLocation == null ? _speak() : null;
 
     if (_currentLocation != null) {
       currentLatLng =
@@ -162,8 +193,6 @@ class _MapScreenState extends State<MapScreen> {
     }
     return Scaffold(
       key: _scaffoldKey,
-      
-     
       body: RefreshIndicator(
         onRefresh: () async {
           await _getRoutePoints();
@@ -312,7 +341,6 @@ class _MapScreenState extends State<MapScreen> {
                                       size: 30,
                                     ),
                                   ),
-                                  
                                   Container(
                                     width: 35,
                                     height: 35,
