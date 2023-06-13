@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:lucideye/constants/colors.dart';
@@ -10,7 +9,6 @@ import 'package:lucideye/features/view/emergencyscreen.dart';
 import 'package:picovoice_flutter/picovoice_error.dart';
 import 'package:picovoice_flutter/picovoice_manager.dart';
 import 'package:rhino_flutter/rhino.dart';
-
 import '../time_date_models/date.dart';
 import '../time_date_models/time.dart';
 
@@ -89,35 +87,42 @@ class _NavigationBarScreenState extends State<NavigationBarScreen> {
   }
 
   void _inferenceCallback(RhinoInference inference) {
-    print("============= RHINO INFERENCE: $inference===================");
+    print("============= RHINO INFERENCE: ${inference.toString()}===================");
     if (inference.isUnderstood!) {
       Map<String, String> slots = inference.slots!;
       if (inference.intent == 'objectdetector') {
+        print("============= NAVIGATING TO DETECTION SCREEN===================");
         setState(() {
           _onItemTapped(0);
         });
       } else if (inference.intent == 'map_screen') {
+        print("============= NAVIGATING TO MAP SCREEN===================");
         setState(() {
           _onItemTapped(1);
         });
       }else if (inference.intent == 'chatscreen') {
+        print("============= NAVIGATING TO CHAT SCREEN===================");
         setState(() {
           _onItemTapped(2);
         });
       }else if (inference.intent == 'help') {
+        print("============= NAVIGATING TO SOS SCREEN===================");
         setState(() {
           _onItemTapped(3);
         });
       }
       }else if (inference.intent == 'date') {
+        print("============= DATE FOUND AND SAID SUCCESSFULLY===================");
         setState(() {
           GetDate().speakDate();
         });
       }else if (inference.intent == 'tommorrow') {
+      print("============= TOMORROW DATE FOUND AND SAID SUCCESSFULLY===================");
         setState(() {
           GetDate().speakTomorrowDate();
         });
       }else if (inference.intent == 'time') {
+      print("============= TIME FOUND AND SAID SUCCESSFULLY===================");
         setState(() {
           TimerTime().timer();
         });
