@@ -1,8 +1,3 @@
-# lucideye
-
-AI blind assistance app
-
-## Getting Started
 
 
 # FLUTTER VERSION ------3.7.6
@@ -56,3 +51,8 @@ You can look for an assistant who is able to help you
 
 ---
 See blind people looking for assistance amd connect with them
+=======
+This project us an AI flutter assistance app for blind people
+
+Initially built as a school project, but later developed more to add more extended features
+
