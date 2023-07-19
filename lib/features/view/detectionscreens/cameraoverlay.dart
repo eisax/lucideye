@@ -52,7 +52,7 @@ class _QRScannerOverlayState extends State<QRScannerOverlay> {
       Align(
         alignment: Alignment.center,
         child: CustomPaint(
-          foregroundPainter: BorderPainter(widget.lineColor),
+          foregroundPainter: BorderPainter(widget.lineColor,widget.scanAreaRadius),
           child: SizedBox(
             width: widget.scanAreaWidth + 25,
             height: widget.scanAreaHeight + 25,
@@ -66,21 +66,22 @@ class _QRScannerOverlayState extends State<QRScannerOverlay> {
 // Creates the white borders
 class BorderPainter extends CustomPainter {
   Color lineColor;
+  late double lineRadius;
 
-  BorderPainter(this.lineColor);
+  BorderPainter(this.lineColor,this.lineRadius);
   @override
   void paint(Canvas canvas, Size size) {
-    const width = 4.0;
-    const radius = 20.0;
-    const tRadius = 3 * radius;
+    const width = 1.0;
+    final radius = lineRadius;
+    final tRadius = 20*3.0;
     final rect = Rect.fromLTWH(
       width,
       width,
       size.width - 2 * width,
       size.height - 2 * width,
     );
-    final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(radius));
-    const clippingRect0 = Rect.fromLTWH(
+    final rrect = RRect.fromRectAndRadius(rect,  Radius.circular(radius));
+    final clippingRect0 = Rect.fromLTWH(
       0,
       0,
       tRadius,

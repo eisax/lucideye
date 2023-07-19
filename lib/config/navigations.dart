@@ -18,9 +18,9 @@ class _NavigationBarScreenState extends State<NavigationBarScreen> {
   int _selectedIndex = 0;
 
   final List<Widget> _screens = [
+    DetectionScreen(),
     MapScreen(),
     ChatbotScreen(),
-    // DetectionScreen(),
     EmergencyScreen(),
   ];
 
@@ -41,7 +41,7 @@ class _NavigationBarScreenState extends State<NavigationBarScreen> {
         index: _selectedIndex,
         children: _screens,
       ),
-      bottomNavigationBar:_selectedIndex==1?null: Container(
+      bottomNavigationBar:_selectedIndex==2?null: Container(
         margin: EdgeInsets.only(left:displayWidth * .1,bottom:displayWidth * .05,right:displayWidth * .1),
         child: Stack(
           children: [
@@ -52,7 +52,7 @@ class _NavigationBarScreenState extends State<NavigationBarScreen> {
                 borderRadius: BorderRadius.circular(displayWidth * 0.5),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
+                    color: mainColor.withOpacity(0.5),
                     spreadRadius: 1,
                     blurRadius: 3,
                     offset: Offset(0, 2),
@@ -63,9 +63,10 @@ class _NavigationBarScreenState extends State<NavigationBarScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  buildBottomNavItem(0, Icons.navigation_outlined, context),
-                  buildBottomNavItem(1, Icons.chat_bubble_outline, context),
-                  buildBottomNavItem(2, Icons.qr_code_scanner, context),
+                  buildBottomNavItem(0, Icons.qr_code_scanner, context),
+                  buildBottomNavItem(1, Icons.navigation_outlined, context),
+                  buildBottomNavItem(2, Icons.chat_bubble_outline, context),
+                  
                   buildBottomNavItem(3, Icons.sos_outlined, context),
                 ],
               ),
@@ -87,7 +88,7 @@ class _NavigationBarScreenState extends State<NavigationBarScreen> {
           Icon(
             icon,
             size: displayWidth * .05,
-            color: _selectedIndex == index ? greyd : Colors.grey,
+            color: _selectedIndex == index ? mainColor : mainColor.withOpacity(0.5),
           ),
           SizedBox(height: displayWidth * .015),
         ],

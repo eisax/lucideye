@@ -1,0 +1,7 @@
+0 1 US Dollar
+1 2 US Dollars
+2 5 US Dollars
+3 10 US Dollars
+4 20 US Dollars
+5 50 US Dollars
+6 100 US Dollars

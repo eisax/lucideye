@@ -6,6 +6,10 @@ import 'package:lucideye/main.dart';
 import 'dart:ui' as ui;
 import '../../../constants/colors.dart';
 import 'package:tflite/tflite.dart';
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter_tts/flutter_tts.dart';
+import 'package:flutter/gestures.dart';
 
 class DetectionScreen_a extends StatefulWidget {
   const DetectionScreen_a({super.key});
@@ -13,6 +17,8 @@ class DetectionScreen_a extends StatefulWidget {
   @override
   State<DetectionScreen_a> createState() => _DetectionScreen_aState();
 }
+
+enum TtsState { playing, stopped, paused, continued }
 
 class _DetectionScreen_aState extends State<DetectionScreen_a> {
   bool screenactive = false;
@@ -23,7 +29,128 @@ class _DetectionScreen_aState extends State<DetectionScreen_a> {
   //model variables
   String result = "";
   String probability = "";
-  String _newVoiceText = "";
+  String _newVoiceText =
+      "This is the object detection screen. Double tap to start object detection. Swipe up to use Text Recognition. Long press to exit the app.";
+
+  //--------------------
+  late FlutterTts flutterTts;
+  String? language;
+  String? engine;
+  double volume = 0.5;
+  double pitch = 1.0;
+  double rate = 0.5;
+
+  TtsState ttsState = TtsState.stopped;
+  //
+
+  //VOICE DATA
+  get isPlaying => ttsState == TtsState.playing;
+  get isStopped => ttsState == TtsState.stopped;
+  get isPaused => ttsState == TtsState.paused;
+  get isContinued => ttsState == TtsState.continued;
+  bool get isAndroid => !kIsWeb && Platform.isAndroid;
+  //
+
+  initTts() {
+    flutterTts = FlutterTts();
+
+    _setAwaitOptions();
+
+    if (isAndroid) {
+      _getDefaultEngine();
+      _getDefaultVoice();
+    }
+
+    flutterTts.setStartHandler(() {
+      setState(() {
+        print("Playing");
+        ttsState = TtsState.playing;
+      });
+    });
+
+    if (isAndroid) {
+      flutterTts.setInitHandler(() {
+        setState(() {
+          print("TTS Initialized");
+        });
+      });
+    }
+
+    flutterTts.setCompletionHandler(() {
+      setState(() {
+        print("Complete");
+        ttsState = TtsState.stopped;
+      });
+    });
+
+    flutterTts.setCancelHandler(() {
+      setState(() {
+        print("Cancel");
+        ttsState = TtsState.stopped;
+      });
+    });
+
+    flutterTts.setPauseHandler(() {
+      setState(() {
+        print("Paused");
+        ttsState = TtsState.paused;
+      });
+    });
+
+    flutterTts.setContinueHandler(() {
+      setState(() {
+        print("Continued");
+        ttsState = TtsState.continued;
+      });
+    });
+
+    flutterTts.setErrorHandler((msg) {
+      setState(() {
+        print("error: $msg");
+        ttsState = TtsState.stopped;
+      });
+    });
+  }
+
+  Future<dynamic> _getLanguages() async => await flutterTts.getLanguages;
+
+  Future<dynamic> _getEngines() async => await flutterTts.getEngines;
+
+  Future _getDefaultEngine() async {
+    var engine = await flutterTts.getDefaultEngine;
+    if (engine != null) {
+      print(engine);
+    }
+  }
+
+  Future _getDefaultVoice() async {
+    var voice = await flutterTts.getDefaultVoice;
+    if (voice != null) {
+      print(voice);
+    }
+  }
+
+  Future _speak() async {
+    // await flutterTts.setVolume(volume);
+    // await flutterTts.setSpeechRate(rate);
+    // await flutterTts.setPitch(pitch);
+
+    if (_newVoiceText != null) {
+      if (_newVoiceText!.isNotEmpty) {
+        await flutterTts.speak(_newVoiceText!);
+      }
+    }
+  }
+
+  Future _setAwaitOptions() async {
+    await flutterTts.awaitSpeakCompletion(true);
+  }
+
+  Future _stop() async {
+    var result = await flutterTts.stop();
+    if (result == 1) setState(() => ttsState = TtsState.stopped);
+  }
+  //--------------------
 
   //LOAD MODEL
   loadModel() async {
@@ -35,8 +162,11 @@ class _DetectionScreen_aState extends State<DetectionScreen_a> {
     print("========MODEL LOADED=============");
   }
 
+  
+
   //CAMERA FUNCTIONS
-  _initializeCamera() {
+  _initializeCamera() async{
+    
     _cameraController = CameraController(cameras[0], ResolutionPreset.max);
     _cameraController.initialize().then((value) {
       if (!mounted) {
@@ -100,31 +230,41 @@ class _DetectionScreen_aState extends State<DetectionScreen_a> {
       });
       print("========RESULT FOUND=============");
       print("DETECTED OBJECT :" + _newVoiceText);
-      // _speak();
+      await _speak();
       isWorking = false;
     }
   }
 
   @override
   void initState() {
+    setState(() {
+      _newVoiceText;
+    });
+    initTts();   
     loadModel();
     super.initState();
   }
 
   @override
   void dispose() async {
-    super.dispose();
-    _cameraController.stopImageStream();
-    _cameraController.dispose();
+    
+    await _stop();
+    await flutterTts.stop();
+    await _cameraController.stopImageStream();
+    await _cameraController.dispose();
     await Tflite.close();
     screenactive = false;
+    super.dispose();
     print("=============removed===============");
+    
   }
 
   @override
   Widget build(BuildContext context) {
     double displayWidth = MediaQuery.of(context).size.width;
     double displayHeight = MediaQuery.of(context).size.height;
+    screenactive != true ? _speak() : null;
+    
     return Stack(
       children: [
         screenactive
@@ -159,23 +299,25 @@ class _DetectionScreen_aState extends State<DetectionScreen_a> {
                                 ? Container()
                                 : Positioned(
                                     child: Center(
-                                    child: Container(
-                                      width: displayWidth * 0.75 - 25,
-                                      height: displayWidth * 0.75 - 25,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        gradient: LinearGradient(
-                                          begin: Alignment.topLeft,
-                                          end: Alignment.bottomRight,
-                                          colors: [
-                                            Colors.white.withOpacity(0.7),
-                                            Colors.grey.withOpacity(0.3),
-                                          ],
+                                      child: Container(
+                                        width: displayWidth * 0.75 - 35,
+                                        height: displayWidth * 0.75 - 25,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                            colors: [
+                                              Colors.white.withOpacity(0.7),
+                                              Colors.grey.withOpacity(0.3),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(10),
-                                        child: Container(
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          child: Container(
                                             decoration: BoxDecoration(
                                               borderRadius:
                                                   BorderRadius.circular(10),
@@ -189,51 +331,79 @@ class _DetectionScreen_aState extends State<DetectionScreen_a> {
                                               ),
                                             ),
                                             child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceEvenly,
                                               children: [
-                                                Container(
-                                                  width: displayWidth * 0.2,
-                                                  height: displayWidth * 0.2,
+                                                SizedBox(
+                                                  width: displayWidth * 0.1,
+                                                  height: displayHeight * 0.1,
                                                   child: Image.asset(
                                                       "assets/neural.png"),
                                                 ),
+                                                Expanded(
+                                                  child: Container(
+                                                    width: displayWidth * 0.7,
+                                                    height:
+                                                        displayHeight * 0.32,
+                                                    // color: mainColor,
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            10),
+                                                    child: result != "" &&
+                                                            result != null
+                                                        ? SingleChildScrollView(
+                                                            child: Text(
+                                                              result.toString(),
+                                                              style: const TextStyle(
+                                                                  fontSize: 12,
+                                                                  color:
+                                                                      primaryColor,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                            ),
+                                                          )
+                                                        : Center(
+                                                            child: Container(
+                                                              width: 50,
+                                                              height: 50,
+                                                              child:
+                                                                  const CircularProgressIndicator(
+                                                                valueColor:
+                                                                    AlwaysStoppedAnimation<
+                                                                            Color>(
+                                                                        mainColor),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                  ),
+                                                ),
                                                 Container(
-                                                  width: displayWidth * 0.7,
-                                                  height: displayWidth * 0.1,
-                                                  child: Center(
+                                                  width: displayWidth * 0.85,
+                                                  color: mainColor,
+                                                  child: TextButton(
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        result = "";
+                                                      });
+                                                    },
                                                     child: Text(
-                                                      _newVoiceText,
+                                                      'Rescan',
                                                       style: TextStyle(
-                                                          fontSize: 15,
+                                                          fontSize: 12,
                                                           color: white,
                                                           fontWeight:
                                                               FontWeight.bold),
                                                     ),
                                                   ),
-                                                ),
-                                                Container(
-                                                  width: displayWidth * 0.7,
-                                                  height: displayWidth * 0.25,
-                                                  color: mainColor,
-                                                ),
-                                                Container(
-                                                  width: displayWidth * 0.7,
-                                                  child: TextButton(
-                                                      onPressed: () {},
-                                                      child: Text(
-                                                        'Cancel',
-                                                        style: TextStyle(
-                                                            fontSize: 20,
-                                                            color: mainColor,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold),
-                                                      )),
                                                 )
                                               ],
-                                            )),
+                                            ),
+                                          ),
+                                        ),
                                       ),
                                     ),
-                                  )),
+                                  )
                           ],
                         )
                       : Center(
@@ -247,113 +417,125 @@ class _DetectionScreen_aState extends State<DetectionScreen_a> {
                         ),
                 ),
               )
-            : Container(
-                padding: EdgeInsets.only(
-                    top: displayHeight * 0.05, bottom: displayHeight * 0.15),
-                width: displayWidth,
-                height: displayHeight,
-                color: white,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.only(
-                          top: displayHeight * 0.05,
-                          bottom: displayHeight * 0.03,
-                          left: 20),
-                      width: displayWidth,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Object Detection',
-                            style: TextStyle(
-                                fontSize: 30,
-                                color: greyd,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Text(
-                            'Shake your phone or press start to start your camera',
-                            style: TextStyle(fontSize: 18, color: greyb),
-                          )
-                        ],
-                      ),
-                    ),
-                    Container(
-                      width: displayWidth,
-                      height: displayHeight * 0.45,
-                      child: Stack(
-                        children: [
-                          Center(
-                            child: Container(
-                              width: displayWidth,
-                              height: displayHeight * 0.15,
-                              child: Image.asset("assets/obj.png"),
+            : GestureDetector(
+                onDoubleTap: () {
+                  _stop();
+                  _initializeCamera();
+
+                  print("=============started camera===============");
+                  setState(() {
+                    screenactive = true;
+                  });
+                },
+                child: Container(
+                  padding: EdgeInsets.only(
+                      top: displayHeight * 0.05, bottom: displayHeight * 0.15),
+                  width: displayWidth,
+                  height: displayHeight,
+                  color: white,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.only(
+                            top: displayHeight * 0.05,
+                            bottom: displayHeight * 0.03,
+                            left: 20),
+                        width: displayWidth,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Object Detection',
+                              style: TextStyle(
+                                  fontSize: 30,
+                                  color: greyd,
+                                  fontWeight: FontWeight.bold),
                             ),
-                          ),
-                          Positioned(
-                            child: Center(
-                              child: CustomPaint(
-                                  painter: BorderPainter(),
-                                  child: Container(
-                                    width: displayHeight * 0.3 * 0.75,
-                                    height: displayHeight * 0.3 * 0.75,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Stack(
-                                      children: [
-                                        Center(
-                                          child: Container(
-                                            width: displayHeight * 0.1 * 0.75,
-                                            height: displayHeight * 0.1 * 0.75,
-                                            decoration: BoxDecoration(
-                                              color: greya.withOpacity(0.7),
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              border: Border.all(
-                                                color: greyd,
-                                                width: 1,
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Text(
+                              'Shake your phone or press start to start your camera',
+                              style: TextStyle(fontSize: 18, color: greyb),
+                            )
+                          ],
+                        ),
+                      ),
+                      Container(
+                        width: displayWidth,
+                        height: displayHeight * 0.45,
+                        child: Stack(
+                          children: [
+                            Center(
+                              child: Container(
+                                width: displayWidth,
+                                height: displayHeight * 0.15,
+                                child: Image.asset("assets/obj.png"),
+                              ),
+                            ),
+                            Positioned(
+                              child: Center(
+                                child: CustomPaint(
+                                    painter: BorderPainter(),
+                                    child: Container(
+                                      width: displayHeight * 0.3 * 0.75,
+                                      height: displayHeight * 0.3 * 0.75,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Stack(
+                                        children: [
+                                          Center(
+                                            child: Container(
+                                              width: displayHeight * 0.1 * 0.75,
+                                              height:
+                                                  displayHeight * 0.1 * 0.75,
+                                              decoration: BoxDecoration(
+                                                color: greya.withOpacity(0.7),
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                border: Border.all(
+                                                  color: greyd,
+                                                  width: 1,
+                                                ),
                                               ),
                                             ),
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                  )),
+                                        ],
+                                      ),
+                                    )),
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          _initializeCamera();
-                          print("=============started camera===============");
-                          setState(() {
-                            screenactive = true;
-                          });
-                        },
-                        style: ElevatedButton.styleFrom(
-                          primary: greyd,
-                          shadowColor: greyd,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          minimumSize: Size(displayWidth * 0.8, 50),
-                        ),
-                        child: Text(
-                          'Start Camera',
-                          style: TextStyle(fontSize: 16, color: Colors.white),
+                          ],
                         ),
                       ),
-                    )
-                  ],
+                      Container(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            _initializeCamera();
+                            print("=============started camera===============");
+                            setState(() {
+                              screenactive = true;
+                            });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            primary: greyd,
+                            shadowColor: greyd,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            minimumSize: Size(displayWidth * 0.8, 50),
+                          ),
+                          child: Text(
+                            'Start Camera',
+                            style: TextStyle(fontSize: 16, color: Colors.white),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               )
       ],
