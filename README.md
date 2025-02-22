@@ -9,6 +9,7 @@
 Josphat K Ndhlovu
 Wilson Khumalo
 Munashe Mambohwa
+Blessing Mupindu
 Tsakane Shiri
 Clever Mavedzenge
 Aime Musiyandaka
